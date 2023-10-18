@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Bill24OnlinePaymentSdk</string>
+    <string name="payment_way">payment method</string>
+    <string name="expire_title">transaction expired</string>
+    <string name="try_again_title">please try again</string>
+    <string name="try_again">try again</string>
+    <string name="scan_to_pay">scan to pay</string>
+    <string name="or">or</string>
+    <string name="download">download</string>
+    <string name="share">share</string>
+    <string name="total_amount">Total Amount</string>
 </resources>

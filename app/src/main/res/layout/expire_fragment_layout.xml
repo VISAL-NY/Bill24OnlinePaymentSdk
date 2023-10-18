@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:layout_marginBottom="@dimen/dimen_size20"
+    >
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/image_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_size20"
+        android:src="@drawable/warning_icon"
+
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_marginTop="@dimen/dimen_size20"
+        android:id="@+id/text_expire_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/expire_title"
+        />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dash_line_horizontal"
+        android:layout_marginTop="@dimen/dimen_size20"
+        />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text_try_again_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/try_again_title"
+        android:layout_marginTop="@dimen/dimen_size20"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_try_again"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/try_again"
+        android:background="@drawable/button_click_selected"
+        android:textColor="@color/white"
+        android:layout_marginHorizontal="@dimen/dimen_size20"
+        android:layout_marginTop="@dimen/dimen_size30"
+        />
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

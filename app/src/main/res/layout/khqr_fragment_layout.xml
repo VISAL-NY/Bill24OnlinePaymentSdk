@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <!--  timer loading  -->
+        <include layout="@layout/time_loading_layout"/>
+
+        <!--   khqr card-->
+        <androidx.cardview.widget.CardView
+            android:layout_width="@dimen/khqr_card_width"
+            android:layout_height="@dimen/khqr_card_height"
+            android:layout_gravity="center"
+            android:elevation="10dp"
+            app:cardCornerRadius="@dimen/dimen_size30"
+            android:background="@color/douwnload_share_color"
+            >
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@color/khqr_backgound_color"
+                    />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_marginTop="@dimen/dimen_size12_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/khqr_image"
+                    android:layout_gravity="center|top"
+                    />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="60dp"
+                    >
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/cut_corner_background_white_shape"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+
+                        <!--customer name amount-->
+                        <include layout="@layout/customer_name_amount_layout"/>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@drawable/dash_line_horizontal"
+                            />
+
+                        <!--     qrcode-->
+                        <include layout="@layout/qrcode_image_layout"/>
+
+                    </LinearLayout>
+                </FrameLayout>
+            </FrameLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/scan_to_pay"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/dimen_size20"
+            android:layout_marginBottom="@dimen/dimen_size20"
+            />
+
+        <!--dash line-->
+        <include layout="@layout/dash_line_text_center_layout"/>
+
+        <!--    download - share-->
+        <include layout="@layout/download_share_layout"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+
+</androidx.core.widget.NestedScrollView>

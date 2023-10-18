@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginBottom="@dimen/dimen_size6_25"
+    android:layout_marginTop="@dimen/dimen_size6_25"
+    app:cardCornerRadius="12dp"
+    android:layout_marginHorizontal="@dimen/dimen_size20"
+    >
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/recyclerview_item_select"
+            android:padding="@dimen/dimen_size10"
+        >
+
+<!--   bank icon bank name-->
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/bank_name_icon_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginEnd="@dimen/dimen_size50">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/image_bank_icon"
+                    android:layout_width="@dimen/dimen_size40"
+                    android:layout_height="@dimen/dimen_size40"
+                    android:src="@drawable/baseline_face_24"
+                    android:layout_gravity="center"
+                    android:scaleType="fitXY"
+                    />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_marginLeft="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    >
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/text_bank_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:gravity="top"
+                        android:layout_gravity="top"
+                        android:text="ទូទាត់តាម រយះ KHQR"
+                        />
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        >
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/text_payment_service_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:textColor="@color/black"
+                            android:text="សេវា : "
+                            android:gravity="bottom"
+
+                            />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/text_payment_service_amount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:textColor="@color/black"
+                            android:text="0.2 "
+                            android:layout_toRightOf="@+id/text_payment_service_title"
+                            android:gravity="bottom"
+                            />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/text_payment_service_currency"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textColor="@color/black"
+                            android:text="USD"
+                            android:layout_toRightOf="@+id/text_payment_service_amount"
+                            android:gravity="bottom"
+                            />
+                    </RelativeLayout>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+<!--    add to favorite-->
+            <FrameLayout
+                android:id="@+id/add_to_favorite_container"
+                android:layout_gravity="right|center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/bank_name_icon_container">
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/container_bank_icon_favorite_icon_shape"/>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/image_favorite_icon"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/baseline_star_outline_24"/>
+            </FrameLayout>
+        </FrameLayout>
+
+</androidx.cardview.widget.CardView>

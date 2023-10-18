@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="right"
+    android:layout_marginVertical="@dimen/dimen_size12_5"
+    android:layout_marginRight="@dimen/dimen_size12_5">
+
+   <com.wang.avi.AVLoadingIndicatorView
+       android:id="@+id/image_loading"
+       android:layout_width="@dimen/dimen_size20"
+       android:layout_height="@dimen/dimen_size20"
+       app:indicatorName="LineSpinFadeLoaderIndicator"
+       android:layout_marginRight="@dimen/dimen_size6_25"
+       app:indicatorColor="@color/loading_indicator_color"/>
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="timer"
+        android:layout_toRightOf="@+id/image_loading"
+        android:layout_alignBottom="@+id/image_loading"
+        android:layout_centerInParent="true"
+        />
+</RelativeLayout>
