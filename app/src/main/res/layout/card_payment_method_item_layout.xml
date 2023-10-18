@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="60dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginBottom="@dimen/dimen_size6_25"
-    android:layout_marginTop="@dimen/dimen_size6_25"
+    android:layout_marginBottom="@dimen/payment_card_horizontal"
     app:cardCornerRadius="12dp"
-    android:layout_marginHorizontal="@dimen/dimen_size20"
+    android:layout_marginHorizontal="@dimen/payment_card_horizontal"
     >
     <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@drawable/recyclerview_item_select"
+            android:layout_height="match_parent"
+            android:background="@drawable/recyclerview_item_select_state"
             android:padding="@dimen/dimen_size10"
+
         >
 
 <!--   bank icon bank name-->
@@ -87,13 +87,11 @@
             <FrameLayout
                 android:id="@+id/add_to_favorite_container"
                 android:layout_gravity="right|center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/bank_name_icon_container">
-                <View
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/container_bank_icon_favorite_icon_shape"/>
+                android:layout_width="@dimen/dimen_size40"
+                android:layout_height="@dimen/dimen_size40"
+                android:layout_toRightOf="@+id/bank_name_icon_container"
+                android:background="@drawable/favorite_item_select_state">
+
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/image_favorite_icon"

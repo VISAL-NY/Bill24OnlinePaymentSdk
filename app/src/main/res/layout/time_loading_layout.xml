@@ -12,7 +12,7 @@
        android:layout_width="@dimen/dimen_size20"
        android:layout_height="@dimen/dimen_size20"
        app:indicatorName="LineSpinFadeLoaderIndicator"
-       android:layout_marginRight="@dimen/dimen_size6_25"
+       android:layout_marginRight="@dimen/dimen_size7_25"
        app:indicatorColor="@color/loading_indicator_color"/>
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text_timer"

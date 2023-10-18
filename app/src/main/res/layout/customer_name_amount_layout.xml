@@ -28,7 +28,7 @@
             android:textFontWeight="700"
             android:textColor="@color/black"
             android:fontFamily="@font/nunitosan_font_family"
-            android:layout_marginEnd="@dimen/dimen_size6_25"
+            android:layout_marginEnd="@dimen/dimen_size7_25"
             />
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_khqr_currency"

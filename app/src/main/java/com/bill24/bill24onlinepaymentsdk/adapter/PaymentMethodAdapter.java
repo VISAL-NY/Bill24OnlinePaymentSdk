@@ -13,13 +13,15 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bill24.bill24onlinepaymentsdk.R;
+import com.bill24.bill24onlinepaymentsdk.helper.StickyHeaderItemDecoration;
 import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodItemModel;
 import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements StickyHeaderItemDecoration.StickyHeaderInterface {
 
     private static final int VIEW_HEADER_TYPE=0;
     private static final int VIEW_ITEM_TYPE=1;
@@ -103,7 +105,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
         for (BankPaymentMethodModel section : bankPaymentMethodModelList) {
             if (currentPos == position) {
                 // Bind data for section
-                ((SectionViewHolder) holder).bind(section);
+                ((SectionViewHolder) holder).bindSection(section);
                 return; // Exit the method after binding the section
             }
 
@@ -113,12 +115,15 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
                 for (BankPaymentMethodItemModel item : section.getItems()) {
                     if (currentPos == position) {
                         // Bind data for item
-                        ((BankItemViewHolder) holder).bind(item);
+                        ((BankItemViewHolder) holder).bindItem(item);
 
                         //Set Item Click Event
-                        ((BankItemViewHolder) holder).itemBankContainer.setOnClickListener(v->{
-//
+                        ((BankItemViewHolder) holder).itemView.setOnClickListener(v->{
                             listener.OnItemPaymentMethodClick(item.getId());
+                        });
+
+                        ((BankItemViewHolder)holder).addToFavoriteContainer.setOnClickListener(v->{
+                            listener.OnFavoriteIconClick(item.isFavorite());
                         });
 
 
@@ -187,6 +192,38 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
         return count;
     }
 
+    @Override
+    public int getHeaderPositionForItem(int itemPosition) {
+       int headerPosition=0;
+        do{
+                if(this.isHeader(itemPosition)){
+                    headerPosition=itemPosition;
+                }
+                itemPosition-=1;
+        }while (itemPosition>=0);
+        return headerPosition;
+    }
+
+    @Override
+    public int getHeaderLayout(int headerPosition) {
+        return R.layout.section_header_layout;
+    }
+
+    @Override
+    public void bindHeaderData(View header, int headerPosition) {
+        AppCompatTextView textHeader=header.findViewById(R.id.text_section_header);
+        textHeader.setText(bankPaymentMethodModelList.get(headerPosition).getSectionKh());
+    }
+
+    @Override
+    public boolean isHeader(int itemPosition) {
+       if(itemPosition >= bankPaymentMethodModelList.size()){
+           return false;
+       }
+       BankPaymentMethodItemModel item=bankPaymentMethodModelList.get(itemPosition).getItems().get(itemPosition);
+       return item.getName() !=null && item.getId()==null;
+    }
+
 
     public class SectionViewHolder extends RecyclerView.ViewHolder {
         private AppCompatTextView textSection;
@@ -194,8 +231,8 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
             super(itemView);
             textSection=itemView.findViewById(R.id.text_section_header);
         }
-        void bind(BankPaymentMethodModel section){
-            textSection.setText(section.getSection());
+        void bindSection(BankPaymentMethodModel section){
+            textSection.setText(section.getSectionKh());
         }
     }
 
@@ -203,7 +240,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
         private AppCompatTextView textBankName,textBankServicePayment_Amount;
         private AppCompatImageView imageFavoriteIcon, imageBankIcon;
         private LinearLayoutCompat itemBankContainer;
-        private FrameLayout addToFavorite;
+        private FrameLayout addToFavoriteContainer;
         public BankItemViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -212,7 +249,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
             imageFavoriteIcon=itemView.findViewById(R.id.image_favorite_icon);
             imageBankIcon =itemView.findViewById(R.id.image_bank_icon);
             itemBankContainer=itemView.findViewById(R.id.bank_name_icon_container);
-            addToFavorite=itemView.findViewById(R.id.add_to_favorite_container);
+            addToFavoriteContainer=itemView.findViewById(R.id.add_to_favorite_container);
 //            itemBankContainer.setOnClickListener(v->{
 //                Toast.makeText(v.getContext(),"container",Toast.LENGTH_SHORT).show();
 //            });
@@ -221,14 +258,14 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
 //            });
         }
 
-        void bind(BankPaymentMethodItemModel bankPaymentMethodItemModel){
-            textBankName.setText(bankPaymentMethodItemModel.getName());
+        void bindItem(BankPaymentMethodItemModel bankPaymentMethodItemModel){
+            textBankName.setText(bankPaymentMethodItemModel.getNameKh());
             textBankServicePayment_Amount.setText(""+bankPaymentMethodItemModel.getFee());
-            Picasso.get().load(bankPaymentMethodItemModel.getLogo()).into(imageBankIcon);
+            Picasso.get().load(bankPaymentMethodItemModel.getLogo()).placeholder(R.drawable.placeholder_image).into(imageBankIcon);
         }
     }
     public interface PaymentMethodClickListener{
        void OnItemPaymentMethodClick(String id);
-       void OnFavoriteIconClick(int position);
+       void OnFavoriteIconClick(boolean isFavorite);
     }
 }

@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#F33C3C"
-    android:paddingVertical="10dp"
+    android:layout_height="@dimen/section_header_height"
+    android:background="@color/header_background_color"
+    android:orientation="vertical"
+    android:gravity="center"
     android:paddingLeft="@dimen/dimen_size30"
+    android:layout_marginBottom="@dimen/section_header_margin_bottom"
     >
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text_section_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Section Header"
-
+        android:textColor="@color/header_font_color"
         />
 
 </androidx.appcompat.widget.LinearLayoutCompat>
