@@ -2,7 +2,7 @@ package com.bill24.bill24onlinepaymentsdk.model.requestModel;
 
 import com.google.gson.annotations.SerializedName;
 
-public class CheckoutDetailRequestModel {
+public class ExpiredRequestModel {
     public String getTranId() {
         return tranId;
     }
@@ -11,7 +11,7 @@ public class CheckoutDetailRequestModel {
         this.tranId = tranId;
     }
 
-    public CheckoutDetailRequestModel(String tranId) {
+    public ExpiredRequestModel(String tranId) {
         this.tranId = tranId;
     }
 

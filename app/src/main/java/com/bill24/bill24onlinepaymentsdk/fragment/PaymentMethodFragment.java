@@ -1,36 +1,48 @@
 package com.bill24.bill24onlinepaymentsdk.fragment;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bill24.bill24onlinepaymentsdk.R;
 import com.bill24.bill24onlinepaymentsdk.adapter.PaymentMethodAdapter;
+import com.bill24.bill24onlinepaymentsdk.bottomsheetDialogFragment.BottomSheet;
 import com.bill24.bill24onlinepaymentsdk.helper.ChangLanguage;
+import com.bill24.bill24onlinepaymentsdk.helper.SetFont;
+import com.bill24.bill24onlinepaymentsdk.helper.SharePreferenceCustom;
 import com.bill24.bill24onlinepaymentsdk.helper.StickyHeaderItemDecoration;
+import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodItemModel;
 import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodModel;
-import com.bill24.bill24onlinepaymentsdk.model.conts.Constant;
-import com.bill24.bill24onlinepaymentsdk.model.core.RetrofitClient;
-import com.bill24.bill24onlinepaymentsdk.model.requestModel.CheckoutDetailRequestModel;
+import com.bill24.bill24onlinepaymentsdk.model.ExpiredTransactionModel;
+import com.bill24.bill24onlinepaymentsdk.model.GenerateLinkDeepLinkModel;
 import com.bill24.bill24onlinepaymentsdk.model.TransactionInfoModel;
-import com.bill24.bill24onlinepaymentsdk.model.resonseModel.CheckoutDetailResponseModel;
+import com.bill24.bill24onlinepaymentsdk.model.baseResponseModel.BaseResponse;
+import com.bill24.bill24onlinepaymentsdk.model.conts.Bank;
+import com.bill24.bill24onlinepaymentsdk.model.conts.Constant;
+import com.bill24.bill24onlinepaymentsdk.model.core.RequestAPI;
+import com.bill24.bill24onlinepaymentsdk.model.requestModel.ExpiredRequestModel;
+import com.bill24.bill24onlinepaymentsdk.model.requestModel.GenerateDeeplinkRequestModel;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -39,24 +51,23 @@ import retrofit2.Response;
 
 public class PaymentMethodFragment extends Fragment implements PaymentMethodAdapter.PaymentMethodClickListener {
     private RecyclerView recyclerViewPaymentMethod;
-    private AppCompatTextView textVersion,textPaymentMethod,textTotalAmount,textTotalAmountTitle;
-    private FrameLayout progressBar;
+    private AppCompatTextView textVersion,
+            textTotalAmount,textCurrency,textPaymentMethod,
+            textTotalAmountTitle;
     private List<BankPaymentMethodModel> bankPaymentMethodModelList;
-    private String languageCode;
     private TransactionInfoModel transactionInfoModel;
-    private PaymentMethodAdapter adapter;
-    private CheckoutDetailRequestModel requestModel=new CheckoutDetailRequestModel();
-    public PaymentMethodFragment(String languageCode){
-        this.languageCode=languageCode;
-    }
+
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ChangLanguage.setLanguage(languageCode,getContext());
-        requestModel.setTranId("1");
-        transactionInfoModel=new TransactionInfoModel("My Name","USD","https://chart.apis.google.com/chart?cht=qr&chs=300x300&chld=L|0&chl=00020101021230350016amkbkhppxxx%40amkb010436550203AMK520449005802KH5913Virackbot+Jr.6010Phnom+Penh540510.20530384055020256040.2062380306Bill240504D90107031110802V21103CH163043B70","10.4");
-
+        ChangLanguage.setLanguage("kh",getContext());
+        SharedPreferences preferences=getActivity().getPreferences(Context.MODE_PRIVATE);
+        String bankPaymentMethodJson=preferences.getString(Constant.KEY_PAYMENT_METHOD,"");
+        bankPaymentMethodModelList=SharePreferenceCustom.convertFromJsonToListObject(bankPaymentMethodJson,BankPaymentMethodModel.class);
+        String transactionInfoJson=preferences.getString(Constant.KEY_TRANSACTION_INFO,"");
+        transactionInfoModel=SharePreferenceCustom.converJsonToObject(transactionInfoJson, TransactionInfoModel.class);
     }
 
     @Nullable
@@ -65,24 +76,74 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
         View view=inflater.inflate(R.layout.payment_method_fragment_layout,container,false);
         initView(view);
         bindView();
-        progressBar.setVisibility(View.VISIBLE);
-        //
-        postCheckoutDetail();
+
+        //Set Up RecyclerView
+        setupRecyclerView(this);
+
+        //Update Font
+        updateFont();
 
 
         //Change Font Family and Font Size
-        Typeface typeface;
-        if(languageCode=="en"){
-            typeface= ResourcesCompat.getFont(getContext(),R.font.roboto_bold);
-        }else {
-            typeface=ResourcesCompat.getFont(getContext(),R.font.battambang_bold);
-        }
+    //    Typeface typeface;
+//        if(languageCode== "en"){
+//            typeface= ResourcesCompat.getFont(getContext(),R.font.roboto_bold);
+//        }else {
+//            typeface=ResourcesCompat.getFont(getContext(),R.font.battambang_bold);
+//        }
+//        textPaymentMethod.setTypeface(typeface);
+//        textPaymentMethod.setTextSize(16);
+//        textTotalAmountTitle.setTypeface(typeface);
+//        textTotalAmountTitle.setTextSize(10);
+
+        //Display Version to Screen
+        displayOsVersion();
+
+        return view;
+    }
+
+    private void initView(View view){
+        textPaymentMethod=view.findViewById(R.id.text_payment_method);
+        recyclerViewPaymentMethod=view.findViewById(R.id.recycler_payment_method);
+        textTotalAmountTitle=view.findViewById(R.id.text_total_amount_title);
+        textVersion=view.findViewById(R.id.text_version);
+        textCurrency=view.findViewById(R.id.text_total_amount_currency);
+        textTotalAmount =view.findViewById(R.id.text_total_amount);
+    }
+
+    private void bindView(){
+        textTotalAmount.setText(transactionInfoModel.getTranAmountDisplay());
+        textCurrency.setText(transactionInfoModel.getCurrency());
+    }
+
+    private void updateFont(){
+        SetFont font=new SetFont();
+        Typeface typeface=font.setFont(getContext(),"km");
         textPaymentMethod.setTypeface(typeface);
         textPaymentMethod.setTextSize(16);
+        textPaymentMethod.setPaintFlags(Paint.FAKE_BOLD_TEXT_FLAG);
+        textPaymentMethod.setTextColor(getResources().getColor(R.color.header_font_color));
+
         textTotalAmountTitle.setTypeface(typeface);
         textTotalAmountTitle.setTextSize(10);
 
-        //Display Version to Screen
+
+    }
+
+    private void setupRecyclerView(PaymentMethodAdapter.PaymentMethodClickListener listener){
+        if(bankPaymentMethodModelList !=null && !bankPaymentMethodModelList.isEmpty()){
+            PaymentMethodAdapter adapter=new PaymentMethodAdapter();
+            adapter.setPaymentMethod(bankPaymentMethodModelList);
+            adapter.setOnItemClickListener(listener);
+            recyclerViewPaymentMethod.setLayoutManager(new LinearLayoutManager(getContext()));
+            recyclerViewPaymentMethod.setAdapter(adapter);
+             //Set Header to Sticky
+            StickyHeaderItemDecoration stickyHeaderItemDecoration=new StickyHeaderItemDecoration((StickyHeaderItemDecoration.StickyHeaderInterface)adapter);
+            recyclerViewPaymentMethod.addItemDecoration(stickyHeaderItemDecoration);
+        }
+    }
+
+    private void displayOsVersion(){
         try {
             PackageInfo packageInfo=getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(),0);
             String version=packageInfo.versionName;
@@ -91,124 +152,83 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
         }catch (PackageManager.NameNotFoundException e){
             e.printStackTrace();
         }
-
-
-//        PaymentMethodAdapter  paymentMethodAdapter=new PaymentMethodAdapter();
-//        paymentMethodAdapter.setPaymentMethod(bankPaymentMethodModelList);
-      //  paymentMethodAdapter.setOnItemClickListener(this);
-//        recyclerViewPaymentMethod.setLayoutManager(new LinearLayoutManager(getContext()));
-//        recyclerViewPaymentMethod.setAdapter(paymentMethodAdapter);
-
-        return view;
     }
 
-   // @Override
-   // public void OnItemPaymentMethodClick(int position) {
-//        int myPosition= itemList.get(position).hashCode();
-//       Toast.makeText(getContext(),""+myPosition,Toast.LENGTH_SHORT).show();
+    @Override
+    public void OnItemPaymentMethodClick(BankPaymentMethodItemModel itemModel) {
+        //Toast.makeText(getContext(),"new click"+itemModel.getId(),Toast.LENGTH_SHORT).show();
 
-
-//Replace Fragment
-//        KhqrFragment khqrFragment=new KhqrFragment("km");
-//        Bundle bundle=new Bundle();
-//        bundle.putSerializable("tranInfo", (Serializable) transactionInfoModel);
-//        khqrFragment.setArguments(bundle);
-//
-//        Log.e("transactionddd", "OnItemPaymentMethodClick: "+transactionInfoModel.getTranId(),null );
-//
-//        ((BottomSheet)getParentFragment()).showFragment(khqrFragment);
-
-    //}
-
-//    @Override
-//    public void OnFavoriteIconClick(int position) {
-//        //Toast.makeText(getContext(),itemList.get(position),Toast.LENGTH_SHORT).show();
-//
-//    }
-
-    private void initView(View view){
-        recyclerViewPaymentMethod=view.findViewById(R.id.recycler_payment_method);
-        textVersion=view.findViewById(R.id.text_version);
-        textPaymentMethod=view.findViewById(R.id.text_payment_method);
-        textTotalAmountTitle=view.findViewById(R.id.text_total_amount_title);
-        textTotalAmount =view.findViewById(R.id.text_total_amount);
-        progressBar=view.findViewById(R.id.progress_circular);
-    }
-
-    private void bindView(){
-        textTotalAmount.setText(transactionInfoModel.getTotalAmountDisplay());
-        textTotalAmount.setTextSize(21);
-    }
-
-
-    private void setupRecyclerView(){
-        if(bankPaymentMethodModelList !=null && !bankPaymentMethodModelList.isEmpty()){
-            adapter=new PaymentMethodAdapter();
-            adapter.setPaymentMethod(bankPaymentMethodModelList);
-            adapter.setOnItemClickListener(new PaymentMethodAdapter.PaymentMethodClickListener() {
-                @Override
-                public void OnItemPaymentMethodClick(String id) {
-                    Toast.makeText(getContext(),""+id,Toast.LENGTH_SHORT).show();
+        ExpiredRequestModel expiredRequestModel=new ExpiredRequestModel(transactionInfoModel.getTranId());
+        GenerateDeeplinkRequestModel generateDeeplinkRequestModel=new GenerateDeeplinkRequestModel(itemModel.getId(),transactionInfoModel.getTranId());
+        switch (itemModel.getId()){
+            case Bank.KHQR:
+                Fragment fragment=getParentFragment();
+                if(fragment !=null && fragment instanceof BottomSheet){
+                    ((BottomSheet)getParentFragment()).showFragment(new KhqrFragment());
                 }
+                break;
+            case Bank.AMK:
+                postExpiredTran(expiredRequestModel);
+                postGenerateDeeplink(generateDeeplinkRequestModel);
 
-                @Override
-                public void OnFavoriteIconClick(boolean isFavorite) {
-                    Toast.makeText(getContext(),""+isFavorite,Toast.LENGTH_SHORT).show();
+
+                //Todo set deeplink and web checkout
+                if(itemModel.isSupportDeeplink()){
 
                 }
-            });
-            recyclerViewPaymentMethod.setLayoutManager(new LinearLayoutManager(getContext()));
-            recyclerViewPaymentMethod.setAdapter(adapter);
-        //Set Header to Sticky
-            StickyHeaderItemDecoration stickyHeaderItemDecoration=new StickyHeaderItemDecoration((StickyHeaderItemDecoration.StickyHeaderInterface)adapter);
-            recyclerViewPaymentMethod.addItemDecoration(stickyHeaderItemDecoration);
-
-
+                if(itemModel.isSupportCheckoutPage()){
+                    ((BottomSheet)getParentFragment()).showFragment(new WebViewCheckoutFragment());
+                }
+                break;
         }
+
     }
 
-    private void postCheckoutDetail(){
-        Call<CheckoutDetailResponseModel> call=
-                RetrofitClient.getInstance().getApiClient()
-                                .postCheckoutDetail(Constant.TOKEN,requestModel);
+    @Override
+    public void OnFavoriteIconClick() {
 
-        call.enqueue(new Callback<CheckoutDetailResponseModel>() {
+    }
+
+    private void postExpiredTran(ExpiredRequestModel model){
+        RequestAPI requestAPI=new RequestAPI();
+        Call<BaseResponse<ExpiredTransactionModel>> call=requestAPI.postExpireTran(model);
+        call.enqueue(new Callback<BaseResponse<ExpiredTransactionModel>>() {
             @Override
-            public void onResponse(Call<CheckoutDetailResponseModel> call, Response<CheckoutDetailResponseModel> response) {
-                displayProgressIndicator();
-                if(response.isSuccessful()){
-                    bankPaymentMethodModelList=response.body().getData().getTransInfo().getBankPaymentMethod();
-                    hideProgressIndicator();
-                    setupRecyclerView();
-                }
-               // transactionInfoModel=response.body().getData().getTransInfo();
+            public void onResponse(Call<BaseResponse<ExpiredTransactionModel>> call, Response<BaseResponse<ExpiredTransactionModel>> response) {
+
             }
             @Override
-            public void onFailure(Call<CheckoutDetailResponseModel> call, Throwable t) {
-                Log.e("CBAAAA", "onFailure: "+t.getMessage(), null);
+            public void onFailure(Call<BaseResponse<ExpiredTransactionModel>> call, Throwable t) {
 
             }
         });
     }
 
 
-    @Override
-    public void OnItemPaymentMethodClick(String id) {
-            //Toast.makeText(getContext(),""+bankPaymentMethodModelList.get(position),Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void OnFavoriteIconClick(boolean isFavorite) {
-
-    }
+    //todo launch deeplink mobile
+   private void launchDeeplink(String url){
+            Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(url));
+            startActivity(intent);
+   }
 
 
-    private void displayProgressIndicator(){
-        progressBar.setVisibility(View.VISIBLE);
-    }
-    private void hideProgressIndicator(){
-        progressBar.setVisibility(View.GONE);
-    }
+   //todo request deeplink
+   private void postGenerateDeeplink(GenerateDeeplinkRequestModel model){
+        RequestAPI requestAPI=new RequestAPI();
+        Call<BaseResponse<GenerateLinkDeepLinkModel>> call=requestAPI.postGenerateDeeplink(model);
+        call.enqueue(new Callback<BaseResponse<GenerateLinkDeepLinkModel>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<GenerateLinkDeepLinkModel>> call, Response<BaseResponse<GenerateLinkDeepLinkModel>> response) {
+                response.body();
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<GenerateLinkDeepLinkModel>> call, Throwable t) {
+
+            }
+        });
+   }
+
 }
 
 

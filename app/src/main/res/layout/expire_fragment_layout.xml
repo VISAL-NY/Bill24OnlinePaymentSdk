@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:layout_marginBottom="@dimen/dimen_size20"
+    android:layout_marginBottom="18dp"
     >
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/image_warning"
@@ -16,11 +16,12 @@
         />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:layout_marginTop="@dimen/dimen_size20"
         android:id="@+id/text_expire_title"
+        android:layout_marginTop="@dimen/dimen_size20"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/expire_title"
+        android:textColor="@color/black"
         />
     <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="match_parent"
@@ -34,6 +35,7 @@
         android:layout_height="wrap_content"
         android:text="@string/try_again_title"
         android:layout_marginTop="@dimen/dimen_size20"
+        android:textColor="@color/black"
         />
 
     <androidx.appcompat.widget.AppCompatButton

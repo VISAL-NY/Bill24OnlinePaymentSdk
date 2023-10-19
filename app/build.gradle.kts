@@ -44,4 +44,8 @@ dependencies {
     implementation("com.wang.avi:library:2.1.3")
     //Picaso Loading image
     implementation("com.squareup.picasso:picasso:2.8")
+    //Convert Data Object to Gson
+    implementation("com.google.code.gson:gson:2.10.1")
+    //http log
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 }

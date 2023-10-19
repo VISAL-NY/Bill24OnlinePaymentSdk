@@ -2,7 +2,7 @@ package com.bill24.bill24onlinepaymentsdk.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class DataModel {
+public class CheckoutDetailModel {
     public BillerModel getBiller() {
         return biller;
     }

@@ -1,18 +1,23 @@
 package com.bill24.bill24onlinepaymentsdk.adapter;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
-import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bill24.bill24onlinepaymentsdk.R;
+import com.bill24.bill24onlinepaymentsdk.helper.SetFont;
 import com.bill24.bill24onlinepaymentsdk.helper.StickyHeaderItemDecoration;
 import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodItemModel;
 import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodModel;
@@ -27,6 +32,8 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
     private static final int VIEW_ITEM_TYPE=1;
     private List<BankPaymentMethodModel> bankPaymentMethodModelList;
     private PaymentMethodClickListener listener;
+    private AppCompatTextView textSectionHeader,
+            textBankName, textServiceTitle, textServiceAmount,textCurrency;
 
    public void setPaymentMethod(List<BankPaymentMethodModel> bankPaymentMethodModelList){
        this.bankPaymentMethodModelList=bankPaymentMethodModelList;
@@ -36,6 +43,30 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
         this.listener=listener;
     }
 
+    private void initItemView(View view){
+        textBankName=view.findViewById(R.id.text_bank_name);
+        textServiceTitle=view.findViewById(R.id.text_payment_service_title);
+        textServiceAmount=view.findViewById(R.id.text_payment_service_amount);
+        textCurrency=view.findViewById(R.id.text_payment_service_amount);
+    }
+
+    private void updateHeaderFont(Context context){
+        SetFont font=new SetFont();
+        Typeface typeface=font.setFont(context, "km");
+        textSectionHeader.setTypeface(typeface);
+        textSectionHeader.setTextSize(11);
+        textSectionHeader.setPaintFlags(Paint.FAKE_BOLD_TEXT_FLAG);
+        textSectionHeader.setTextColor(context.getResources().getColor(R.color.header_font_color));
+    }
+
+    private void updateItemFont(Context context){
+//        SetFont font=new SetFont();
+        Typeface bankNameTypeface= ResourcesCompat.getFont(context, R.font.roboto_medium);
+        textBankName.setTypeface(bankNameTypeface);
+        textBankName.setTextSize(12);
+        textBankName.setPaintFlags(Paint.FAKE_BOLD_TEXT_FLAG);
+
+    }
 
 
     @NonNull
@@ -44,9 +75,17 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
         LayoutInflater inflater=LayoutInflater.from(parent.getContext());
         if (viewType==VIEW_HEADER_TYPE){
             View view=inflater.inflate(R.layout.section_header_layout,parent,false);
+            textSectionHeader=view.findViewById(R.id.text_section_header);
+            //Update Font
+            updateHeaderFont(view.getContext());
+
             return new SectionViewHolder(view);
         }else {
             View view=inflater.inflate(R.layout.card_payment_method_item_layout,parent,false);
+            initItemView(view);
+            //Update Font
+            updateItemFont(view.getContext());
+
             return new BankItemViewHolder(view);
         }
 
@@ -119,11 +158,13 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                         //Set Item Click Event
                         ((BankItemViewHolder) holder).itemView.setOnClickListener(v->{
-                            listener.OnItemPaymentMethodClick(item.getId());
+                            listener.OnItemPaymentMethodClick(item);
                         });
 
+                        //Set Favorite Click
                         ((BankItemViewHolder)holder).addToFavoriteContainer.setOnClickListener(v->{
-                            listener.OnFavoriteIconClick(item.isFavorite());
+                            //listener.OnFavoriteIconClick(item.isFavorite());
+                            Toast.makeText(v.getContext(), "NEW A"+item.isFavorite(),Toast.LENGTH_SHORT).show();
                         });
 
 
@@ -211,8 +252,9 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public void bindHeaderData(View header, int headerPosition) {
-        AppCompatTextView textHeader=header.findViewById(R.id.text_section_header);
-        textHeader.setText(bankPaymentMethodModelList.get(headerPosition).getSectionKh());
+       textSectionHeader=header.findViewById(R.id.text_section_header);
+       textSectionHeader.setText(bankPaymentMethodModelList.get(headerPosition).getSectionKh());
+       updateHeaderFont(header.getContext());
     }
 
     @Override
@@ -239,7 +281,6 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
    public  class  BankItemViewHolder extends RecyclerView.ViewHolder {
         private AppCompatTextView textBankName,textBankServicePayment_Amount;
         private AppCompatImageView imageFavoriteIcon, imageBankIcon;
-        private LinearLayoutCompat itemBankContainer;
         private FrameLayout addToFavoriteContainer;
         public BankItemViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -248,24 +289,23 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
             textBankServicePayment_Amount=itemView.findViewById(R.id.text_payment_service_amount);
             imageFavoriteIcon=itemView.findViewById(R.id.image_favorite_icon);
             imageBankIcon =itemView.findViewById(R.id.image_bank_icon);
-            itemBankContainer=itemView.findViewById(R.id.bank_name_icon_container);
             addToFavoriteContainer=itemView.findViewById(R.id.add_to_favorite_container);
-//            itemBankContainer.setOnClickListener(v->{
-//                Toast.makeText(v.getContext(),"container",Toast.LENGTH_SHORT).show();
-//            });
-//            addToFavorite.setOnClickListener(v->{
-//                Toast.makeText(v.getContext(),"add to favorite",Toast.LENGTH_SHORT).show();
-//            });
         }
 
+        @SuppressLint("SetTextI18n")
         void bindItem(BankPaymentMethodItemModel bankPaymentMethodItemModel){
-            textBankName.setText(bankPaymentMethodItemModel.getNameKh());
-            textBankServicePayment_Amount.setText(""+bankPaymentMethodItemModel.getFee());
+            textBankName.setText(bankPaymentMethodItemModel.getName());
+            textBankServicePayment_Amount.setText(String.valueOf(bankPaymentMethodItemModel.getFee()));
             Picasso.get().load(bankPaymentMethodItemModel.getLogo()).placeholder(R.drawable.placeholder_image).into(imageBankIcon);
+            if(bankPaymentMethodItemModel.isFavorite()){
+                imageFavoriteIcon.setImageResource(R.drawable.is_favorite_icon);
+            }else {
+                imageFavoriteIcon.setImageResource(R.drawable.un_favorite_icon);
+            }
         }
     }
     public interface PaymentMethodClickListener{
-       void OnItemPaymentMethodClick(String id);
-       void OnFavoriteIconClick(boolean isFavorite);
+       void OnItemPaymentMethodClick(BankPaymentMethodItemModel id);
+       void OnFavoriteIconClick();
     }
 }

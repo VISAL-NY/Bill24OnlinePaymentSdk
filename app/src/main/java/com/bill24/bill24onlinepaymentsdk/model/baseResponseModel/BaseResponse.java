@@ -1,9 +1,8 @@
-package com.bill24.bill24onlinepaymentsdk.model.resonseModel;
+package com.bill24.bill24onlinepaymentsdk.model.baseResponseModel;
 
-import com.bill24.bill24onlinepaymentsdk.model.DataModel;
 import com.google.gson.annotations.SerializedName;
 
-public class CheckoutDetailResponseModel {
+public class BaseResponse<T> {
     public String getCode() {
         return code;
     }
@@ -28,20 +27,20 @@ public class CheckoutDetailResponseModel {
         this.messageKh = messageKh;
     }
 
-    public DataModel getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(DataModel data) {
+    public void setData(T data) {
         this.data = data;
     }
 
     @SerializedName("code")
     private String code;
     @SerializedName("message")
-    private  String message;
+    private String message;
     @SerializedName("message_kh")
-    private  String messageKh;
+    private String messageKh;
     @SerializedName("data")
-    private  DataModel data;
+    private T data;
 }

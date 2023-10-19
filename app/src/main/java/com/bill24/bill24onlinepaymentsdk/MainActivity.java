@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 //                bottomSheet.show(getSupportFragmentManager(),bottomSheet.getTag());
 
                 Bill24OnlinePayment bill24OnlinePayment=new Bill24OnlinePayment();
-                bill24OnlinePayment.showBottomSheet(getSupportFragmentManager());
+                bill24OnlinePayment.showBottomSheet(getSupportFragmentManager(),"1");
             }
         });
     }

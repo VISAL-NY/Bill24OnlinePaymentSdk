@@ -3,8 +3,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/dimen_size75"
-    android:background="@color/bottom_payment_method_color"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/bottom_payment_method_color">
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -36,16 +36,17 @@
                     android:layout_height="wrap_content"
                     android:textSize="21sp"
                     android:text="237.57"
-                    android:textColor="@color/black"
+                    android:textColor="@color/header_font_color"
                     android:fontFamily="@font/roboto_bold"
                     android:layout_marginRight="@dimen/dimen_size7_25"
                     />
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/text_total_amount_currency"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="USD"
                     android:textSize="14sp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/header_font_color"
                     android:fontFamily="@font/roboto_bold"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -64,7 +65,7 @@
                 android:text="power by"
                 android:textStyle="italic"
                 android:textSize="8sp"
-                android:textColor="@color/black"
+                android:textColor="#A9A9A9"
                 android:fontFamily="@font/roboto_regular"
                 android:layout_marginBottom="@dimen/dimen_size7_25"
                 />
@@ -86,6 +87,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginHorizontal="5dp"
                     android:layout_marginVertical="3dp"
+                    app:dividerColor="#707070"
                     />
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/text_version"
@@ -93,6 +95,7 @@
                     android:layout_height="wrap_content"
                     android:text="V1.0.0.0"
                     android:textSize="10sp"
+                    android:textColor="@color/black"
                     android:fontFamily="@font/roboto_regular"
                     />
             </androidx.appcompat.widget.LinearLayoutCompat>

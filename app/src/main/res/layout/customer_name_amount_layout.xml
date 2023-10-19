@@ -14,7 +14,7 @@
         android:text="kranh virakbot"
         android:textSize="8sp"
         android:textColor="@color/black"
-        android:fontFamily="@font/nunitosan_font_family"
+        android:fontFamily="@font/nunitosans_semi_bold"
         />
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="wrap_content"
@@ -25,9 +25,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="200.57"
-            android:textFontWeight="700"
+            android:textSize="17sp"
             android:textColor="@color/black"
-            android:fontFamily="@font/nunitosan_font_family"
+            android:fontFamily="@font/nunitosans_extra_bold"
             android:layout_marginEnd="@dimen/dimen_size7_25"
             />
         <androidx.appcompat.widget.AppCompatTextView
@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="USD"
-            android:fontFamily="@font/nunitosan_font_family"
+            android:fontFamily="@font/nunitosans_semi_bold"
             android:textSize="8sp"
             android:textColor="@color/black"
             />

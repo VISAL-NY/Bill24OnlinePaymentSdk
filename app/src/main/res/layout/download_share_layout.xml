@@ -4,20 +4,19 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center"
-    android:layout_marginTop="@dimen/dimen_size20"
-    android:layout_marginBottom="@dimen/dimen_size20"
+    android:layout_marginVertical="@dimen/dimen_size20"
     >
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/dimen_size12_5"
         >
 
         <FrameLayout
-            android:id="@+id/image_download"
+            android:id="@+id/download_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/download_share_shape"
-            android:layout_marginEnd="@dimen/dimen_size12_5"
             android:layout_centerHorizontal="true"
             >
             <androidx.appcompat.widget.AppCompatImageView
@@ -32,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/download"
-            android:layout_below="@+id/image_download"
+            android:layout_below="@+id/download_container"
             android:textSize="11sp"
             android:layout_centerHorizontal="true"
             android:paddingTop="2dp"
@@ -42,13 +41,13 @@
    <RelativeLayout
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
+       android:layout_marginStart="@dimen/dimen_size12_5"
        >
        <FrameLayout
-           android:id="@+id/image_share"
+           android:id="@+id/share_container"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:background="@drawable/download_share_shape"
-           android:layout_marginStart="@dimen/dimen_size12_5"
            android:layout_centerHorizontal="true"
            >
            <androidx.appcompat.widget.AppCompatImageView
@@ -59,11 +58,12 @@
                />
        </FrameLayout>
        <androidx.appcompat.widget.AppCompatTextView
+           android:id="@+id/text_share"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:text="@string/share"
            android:textSize="11sp"
-           android:layout_below="@+id/image_share"
+           android:layout_below="@+id/share_container"
            android:layout_centerHorizontal="true"
            android:paddingTop="2dp"
            />
