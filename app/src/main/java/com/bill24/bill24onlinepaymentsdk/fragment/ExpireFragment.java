@@ -1,5 +1,7 @@
 package com.bill24.bill24onlinepaymentsdk.fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -16,14 +18,16 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.fragment.app.Fragment;
 
 import com.bill24.bill24onlinepaymentsdk.R;
+import com.bill24.bill24onlinepaymentsdk.bottomsheetDialogFragment.BottomSheet;
 import com.bill24.bill24onlinepaymentsdk.helper.SetFont;
+import com.bill24.bill24onlinepaymentsdk.model.conts.Constant;
 
 public class ExpireFragment extends Fragment {
     private AppCompatButton buttonTryAgain;
     private AppCompatTextView textTranExpired,textTryAgain;
-    private String languageCode;
-    public ExpireFragment(String languageCode){
-        this.languageCode=languageCode;
+    private String transactionId,refererKey,language;
+    public ExpireFragment(String transactionId){
+      this.transactionId=transactionId;
     }
 
 
@@ -46,6 +50,17 @@ public class ExpireFragment extends Fragment {
         buttonTryAgain.setTypeface(typeface);
         buttonTryAgain.setTextSize(13);
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        SharedPreferences preferences=getActivity().getPreferences(Context.MODE_PRIVATE);
+        //get language
+        language=preferences.getString(Constant.KEY_LANGUAGE_CODE,"");
+        //get refererKey
+        refererKey=preferences.getString(Constant.KEY_REFERER_KEY,"");
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,7 +70,10 @@ public class ExpireFragment extends Fragment {
         updateFont();
 
         buttonTryAgain.setOnClickListener(v->{
-            Toast.makeText(getContext(),"Button Click",Toast.LENGTH_SHORT).show();
+            Fragment fragment=getParentFragment();
+            if(fragment !=null && fragment instanceof BottomSheet){
+                ((BottomSheet)getParentFragment()).showFragment(new KhqrFragment(transactionId));
+            }
         });
 
         return view;

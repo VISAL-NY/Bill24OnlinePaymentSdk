@@ -18,4 +18,5 @@
     <color name="try_again_button_color">#FF528A36</color>
     <color name="douwnload_share_color">#FFD4E8FF</color>
     <color name="loading_indicator_color">#FFA9ADFD</color>
+    <color name="payment_method_backgound">#FBFBFB</color>
 </resources>

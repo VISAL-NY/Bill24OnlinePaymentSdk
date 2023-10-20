@@ -8,5 +8,5 @@ public class Constant {
     public static final String KEY_LANGUAGE_CODE="language-code";
     public static final String KEY_TRANSACTION_INFO="transaction-info";
 
-    public static final String EXPIRED_TIME="expired-time";
+    public static final String KEY_REFERER_KEY="referer-key";
 }

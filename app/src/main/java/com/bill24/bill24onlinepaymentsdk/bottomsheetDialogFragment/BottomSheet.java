@@ -39,11 +39,18 @@ import retrofit2.Response;
 
 public class BottomSheet extends BottomSheetDialogFragment {
 
-    private String transactionId;
+    private String transactionId,refererKey,language="";
     private CheckoutDetailRequestModel requestModel;
     private FrameLayout progressBarContainer;
-    public BottomSheet(String transactionId){
+    public BottomSheet(String transactionId,String refererKey,String language){
         this.transactionId=transactionId;
+        this.refererKey=refererKey;
+        this.language=language;
+        requestModel=new CheckoutDetailRequestModel(this.transactionId);
+    }
+    public BottomSheet(String transactionId,String refererKey){
+        this.transactionId=transactionId;
+        this.refererKey=refererKey;
         requestModel=new CheckoutDetailRequestModel(transactionId);
     }
 
@@ -78,7 +85,7 @@ public class BottomSheet extends BottomSheetDialogFragment {
     }
 
     private void postCheckoutDetail(){
-        RequestAPI requestAPI=new RequestAPI();
+        RequestAPI requestAPI=new RequestAPI(refererKey,language);
         Call<BaseResponse<CheckoutDetailModel>> call=requestAPI.postCheckoutDetail(requestModel);
         call.enqueue(new Callback<BaseResponse<CheckoutDetailModel>>() {
             @Override
@@ -86,9 +93,8 @@ public class BottomSheet extends BottomSheetDialogFragment {
                 if(response.isSuccessful()){
                     List<BankPaymentMethodModel> bankPaymentMethodModelList=response.body().getData().getTransInfo().getBankPaymentMethod();
                     TransactionInfoModel transactionInfoModel=response.body().getData().getTransInfo();
-                    String languageCode=response.body().getData().getTransInfo().getLanguage();
                     if(!bankPaymentMethodModelList.isEmpty()){
-                        setSharePreference(bankPaymentMethodModelList,languageCode,transactionInfoModel);//Store value in sharePreference
+                        setSharePreference(bankPaymentMethodModelList,transactionInfoModel);//Store value in sharePreference
                         showFragment(new PaymentMethodFragment());//Go to Fragment PaymentMethod
                     }
                     hideProgressIndicator();//Hide Progress Indicator
@@ -103,13 +109,12 @@ public class BottomSheet extends BottomSheetDialogFragment {
 
     private void setSharePreference(
             List<BankPaymentMethodModel> bankPaymentMethodModelList,
-            String languageCode,
             TransactionInfoModel transactionInfoModel){
-
         SharedPreferences preferences=getActivity().getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor=preferences.edit();
         editor.putString(Constant.KEY_PAYMENT_METHOD, SharePreferenceCustom.convertListObjectToJson(bankPaymentMethodModelList));
-        editor.putString(Constant.KEY_LANGUAGE_CODE,languageCode);
+        editor.putString(Constant.KEY_LANGUAGE_CODE,language);
+        editor.putString(Constant.KEY_REFERER_KEY,refererKey);
         editor.putString(Constant.KEY_TRANSACTION_INFO,SharePreferenceCustom.convertObjectToJson(transactionInfoModel));
         editor.apply();
     }

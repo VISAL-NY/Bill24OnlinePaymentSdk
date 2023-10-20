@@ -9,7 +9,7 @@
     <dimen name="dimen_size10">10dp</dimen>
     <dimen name="dimen_size30">30dp</dimen>
     <dimen name="khqr_card_width">245dp</dimen>
-    <dimen name="khqr_card_height">356dp</dimen>
+    <dimen name="khqr_card_height">358dp</dimen>
     <dimen name="qrcode_width">195dp</dimen>
     <dimen name="qrcode_height">195dp</dimen>
     <dimen name="dimen_size25">25dp</dimen>

@@ -56,7 +56,9 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
             textTotalAmountTitle;
     private List<BankPaymentMethodModel> bankPaymentMethodModelList;
     private TransactionInfoModel transactionInfoModel;
-
+    private String refererKey,language;
+    public PaymentMethodFragment(){
+    }
 
 
     @Override
@@ -68,6 +70,13 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
         bankPaymentMethodModelList=SharePreferenceCustom.convertFromJsonToListObject(bankPaymentMethodJson,BankPaymentMethodModel.class);
         String transactionInfoJson=preferences.getString(Constant.KEY_TRANSACTION_INFO,"");
         transactionInfoModel=SharePreferenceCustom.converJsonToObject(transactionInfoJson, TransactionInfoModel.class);
+
+        //get language
+        language=preferences.getString(Constant.KEY_LANGUAGE_CODE,"");
+        //get refererKey
+        refererKey=preferences.getString(Constant.KEY_REFERER_KEY,"");
+
+
     }
 
     @Nullable
@@ -83,20 +92,6 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
         //Update Font
         updateFont();
 
-
-        //Change Font Family and Font Size
-    //    Typeface typeface;
-//        if(languageCode== "en"){
-//            typeface= ResourcesCompat.getFont(getContext(),R.font.roboto_bold);
-//        }else {
-//            typeface=ResourcesCompat.getFont(getContext(),R.font.battambang_bold);
-//        }
-//        textPaymentMethod.setTypeface(typeface);
-//        textPaymentMethod.setTextSize(16);
-//        textTotalAmountTitle.setTypeface(typeface);
-//        textTotalAmountTitle.setTextSize(10);
-
-        //Display Version to Screen
         displayOsVersion();
 
         return view;
@@ -133,7 +128,7 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
     private void setupRecyclerView(PaymentMethodAdapter.PaymentMethodClickListener listener){
         if(bankPaymentMethodModelList !=null && !bankPaymentMethodModelList.isEmpty()){
             PaymentMethodAdapter adapter=new PaymentMethodAdapter();
-            adapter.setPaymentMethod(bankPaymentMethodModelList);
+            adapter.setPaymentMethod(bankPaymentMethodModelList,transactionInfoModel.getTranId(),refererKey,language);
             adapter.setOnItemClickListener(listener);
             recyclerViewPaymentMethod.setLayoutManager(new LinearLayoutManager(getContext()));
             recyclerViewPaymentMethod.setAdapter(adapter);
@@ -164,7 +159,7 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
             case Bank.KHQR:
                 Fragment fragment=getParentFragment();
                 if(fragment !=null && fragment instanceof BottomSheet){
-                    ((BottomSheet)getParentFragment()).showFragment(new KhqrFragment());
+                    ((BottomSheet)getParentFragment()).showFragment(new KhqrFragment(transactionInfoModel.getTranId()));
                 }
                 break;
             case Bank.AMK:
@@ -184,13 +179,8 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
 
     }
 
-    @Override
-    public void OnFavoriteIconClick() {
-
-    }
-
     private void postExpiredTran(ExpiredRequestModel model){
-        RequestAPI requestAPI=new RequestAPI();
+        RequestAPI requestAPI=new RequestAPI(refererKey,language);
         Call<BaseResponse<ExpiredTransactionModel>> call=requestAPI.postExpireTran(model);
         call.enqueue(new Callback<BaseResponse<ExpiredTransactionModel>>() {
             @Override
@@ -214,7 +204,7 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
 
    //todo request deeplink
    private void postGenerateDeeplink(GenerateDeeplinkRequestModel model){
-        RequestAPI requestAPI=new RequestAPI();
+        RequestAPI requestAPI=new RequestAPI(refererKey,language);
         Call<BaseResponse<GenerateLinkDeepLinkModel>> call=requestAPI.postGenerateDeeplink(model);
         call.enqueue(new Callback<BaseResponse<GenerateLinkDeepLinkModel>>() {
             @Override

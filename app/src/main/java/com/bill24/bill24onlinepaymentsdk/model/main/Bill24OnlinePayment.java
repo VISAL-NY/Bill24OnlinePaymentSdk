@@ -9,9 +9,14 @@ import com.bill24.bill24onlinepaymentsdk.bottomsheetDialogFragment.BottomSheet;
 public class Bill24OnlinePayment {
     public Bill24OnlinePayment(){
     }
-    public void showBottomSheet(FragmentManager fragmentManager,String transactionId){
-        BottomSheet bottomSheet=new BottomSheet(transactionId);
+    public void showBottomSheet(FragmentManager fragmentManager,String transactionId,String refererKey,String language){
+        BottomSheet bottomSheet=new BottomSheet(transactionId,refererKey,language);
         bottomSheet.show(fragmentManager,bottomSheet.getTag());
+    }
+
+    public void showBottomSheet(FragmentManager fragmentManager,String transactionId,String refererKey){
+        BottomSheet bottomSheet=new BottomSheet(transactionId,refererKey);
+        bottomSheet.show(fragmentManager, bottomSheet.getTag());
     }
 
 }

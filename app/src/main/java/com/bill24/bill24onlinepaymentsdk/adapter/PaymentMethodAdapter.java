@@ -19,11 +19,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bill24.bill24onlinepaymentsdk.R;
 import com.bill24.bill24onlinepaymentsdk.helper.SetFont;
 import com.bill24.bill24onlinepaymentsdk.helper.StickyHeaderItemDecoration;
+import com.bill24.bill24onlinepaymentsdk.model.AddToFavoriteModel;
 import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodItemModel;
 import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodModel;
+import com.bill24.bill24onlinepaymentsdk.model.baseResponseModel.BaseResponse;
+import com.bill24.bill24onlinepaymentsdk.model.conts.Constant;
+import com.bill24.bill24onlinepaymentsdk.model.core.RetrofitClient;
+import com.bill24.bill24onlinepaymentsdk.model.requestModel.AddToFavoriteRequestModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements StickyHeaderItemDecoration.StickyHeaderInterface {
@@ -34,9 +44,18 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
     private PaymentMethodClickListener listener;
     private AppCompatTextView textSectionHeader,
             textBankName, textServiceTitle, textServiceAmount,textCurrency;
+    private String tranasctionId, refererKey,language;
 
-   public void setPaymentMethod(List<BankPaymentMethodModel> bankPaymentMethodModelList){
+   public void setPaymentMethod(
+           List<BankPaymentMethodModel> bankPaymentMethodModelList,
+           String transactionId,
+           String refererKey,
+           String language){
        this.bankPaymentMethodModelList=bankPaymentMethodModelList;
+       this.tranasctionId=transactionId;
+       this.refererKey=refererKey;
+       this.language=language;
+
        notifyDataSetChanged();
    }
     public void setOnItemClickListener(PaymentMethodClickListener listener){
@@ -68,6 +87,25 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     }
 
+    private void postAddToFavorite(String bankId,boolean isFavorite){
+        AddToFavoriteRequestModel model=new AddToFavoriteRequestModel(tranasctionId,bankId,isFavorite);
+        Call<BaseResponse<AddToFavoriteModel>> call= RetrofitClient.getInstance().
+                getApiClient().postAddToFavorite(Constant.CONTENT_TYPE,Constant.TOKEN,refererKey,language,model);
+
+        call.enqueue(new Callback<BaseResponse<AddToFavoriteModel>>() {
+            @Override
+            public void onResponse(Call<BaseResponse<AddToFavoriteModel>> call, Response<BaseResponse<AddToFavoriteModel>> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<AddToFavoriteModel>> call, Throwable t) {
+
+            }
+        });
+    }
+
+
 
     @NonNull
     @Override
@@ -85,6 +123,8 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
             initItemView(view);
             //Update Font
             updateItemFont(view.getContext());
+
+            //Update Image Favorite
 
             return new BankItemViewHolder(view);
         }
@@ -157,14 +197,28 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
                         ((BankItemViewHolder) holder).bindItem(item);
 
                         //Set Item Click Event
-                        ((BankItemViewHolder) holder).itemView.setOnClickListener(v->{
+                        holder.itemView.setOnClickListener(v->{
                             listener.OnItemPaymentMethodClick(item);
                         });
 
                         //Set Favorite Click
                         ((BankItemViewHolder)holder).addToFavoriteContainer.setOnClickListener(v->{
-                            //listener.OnFavoriteIconClick(item.isFavorite());
-                            Toast.makeText(v.getContext(), "NEW A"+item.isFavorite(),Toast.LENGTH_SHORT).show();
+                            item.setFavorite(!item.isFavorite());
+
+                            boolean isFav=item.isFavorite();
+
+                            //todo handle add to favorite with api
+                            if(isFav){
+                                //Toast.makeText(v.getContext(), ""+isFav, Toast.LENGTH_SHORT).show();
+                                postAddToFavorite(item.getId(),isFav);
+                                ((BankItemViewHolder)holder).imageFavIcon.setImageResource(R.drawable.is_favorite_icon);
+
+                            }else {
+                                //Toast.makeText(v.getContext(), ""+isFav, Toast.LENGTH_SHORT).show();
+                                postAddToFavorite(item.getId(),isFav);
+                                ((BankItemViewHolder)holder).imageFavIcon.setImageResource(R.drawable.un_favorite_icon);
+                            }
+
                         });
 
 
@@ -280,14 +334,14 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
 
    public  class  BankItemViewHolder extends RecyclerView.ViewHolder {
         private AppCompatTextView textBankName,textBankServicePayment_Amount;
-        private AppCompatImageView imageFavoriteIcon, imageBankIcon;
+        private AppCompatImageView imageFavIcon, imageBankIcon;
         private FrameLayout addToFavoriteContainer;
         public BankItemViewHolder(@NonNull View itemView) {
             super(itemView);
 
             textBankName=itemView.findViewById(R.id.text_bank_name);
             textBankServicePayment_Amount=itemView.findViewById(R.id.text_payment_service_amount);
-            imageFavoriteIcon=itemView.findViewById(R.id.image_favorite_icon);
+            imageFavIcon=itemView.findViewById(R.id.image_favorite_icon);
             imageBankIcon =itemView.findViewById(R.id.image_bank_icon);
             addToFavoriteContainer=itemView.findViewById(R.id.add_to_favorite_container);
         }
@@ -298,14 +352,13 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
             textBankServicePayment_Amount.setText(String.valueOf(bankPaymentMethodItemModel.getFee()));
             Picasso.get().load(bankPaymentMethodItemModel.getLogo()).placeholder(R.drawable.placeholder_image).into(imageBankIcon);
             if(bankPaymentMethodItemModel.isFavorite()){
-                imageFavoriteIcon.setImageResource(R.drawable.is_favorite_icon);
+                imageFavIcon.setImageResource(R.drawable.is_favorite_icon);
             }else {
-                imageFavoriteIcon.setImageResource(R.drawable.un_favorite_icon);
+                imageFavIcon.setImageResource(R.drawable.un_favorite_icon);
             }
         }
     }
     public interface PaymentMethodClickListener{
        void OnItemPaymentMethodClick(BankPaymentMethodItemModel id);
-       void OnFavoriteIconClick();
     }
 }
