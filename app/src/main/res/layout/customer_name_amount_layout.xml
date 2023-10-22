@@ -24,7 +24,7 @@
             android:id="@+id/text_khqr_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="200.57"
+            android:text="20.00"
             android:textSize="17sp"
             android:textColor="@color/black"
             android:fontFamily="@font/nunitosans_extra_bold"

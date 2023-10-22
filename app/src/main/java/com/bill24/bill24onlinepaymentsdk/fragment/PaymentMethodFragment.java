@@ -2,11 +2,13 @@ package com.bill24.bill24onlinepaymentsdk.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import com.bill24.bill24onlinepaymentsdk.R;
 import com.bill24.bill24onlinepaymentsdk.adapter.PaymentMethodAdapter;
 import com.bill24.bill24onlinepaymentsdk.bottomsheetDialogFragment.BottomSheet;
 import com.bill24.bill24onlinepaymentsdk.helper.ChangLanguage;
+import com.bill24.bill24onlinepaymentsdk.helper.ConnectivityState;
 import com.bill24.bill24onlinepaymentsdk.helper.SetFont;
 import com.bill24.bill24onlinepaymentsdk.helper.SharePreferenceCustom;
 import com.bill24.bill24onlinepaymentsdk.helper.StickyHeaderItemDecoration;
@@ -39,6 +42,7 @@ import com.bill24.bill24onlinepaymentsdk.model.conts.Constant;
 import com.bill24.bill24onlinepaymentsdk.model.core.RequestAPI;
 import com.bill24.bill24onlinepaymentsdk.model.requestModel.ExpiredRequestModel;
 import com.bill24.bill24onlinepaymentsdk.model.requestModel.GenerateDeeplinkRequestModel;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -49,7 +53,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PaymentMethodFragment extends Fragment implements PaymentMethodAdapter.PaymentMethodClickListener {
+public class PaymentMethodFragment extends Fragment
+        implements PaymentMethodAdapter.PaymentMethodClickListener,
+        ConnectivityState.ConnectivityListener {
+    private ConnectivityState connectivityState;
     private RecyclerView recyclerViewPaymentMethod;
     private AppCompatTextView textVersion,
             textTotalAmount,textCurrency,textPaymentMethod,
@@ -60,42 +67,6 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
     public PaymentMethodFragment(){
     }
 
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ChangLanguage.setLanguage("kh",getContext());
-        SharedPreferences preferences=getActivity().getPreferences(Context.MODE_PRIVATE);
-        String bankPaymentMethodJson=preferences.getString(Constant.KEY_PAYMENT_METHOD,"");
-        bankPaymentMethodModelList=SharePreferenceCustom.convertFromJsonToListObject(bankPaymentMethodJson,BankPaymentMethodModel.class);
-        String transactionInfoJson=preferences.getString(Constant.KEY_TRANSACTION_INFO,"");
-        transactionInfoModel=SharePreferenceCustom.converJsonToObject(transactionInfoJson, TransactionInfoModel.class);
-
-        //get language
-        language=preferences.getString(Constant.KEY_LANGUAGE_CODE,"");
-        //get refererKey
-        refererKey=preferences.getString(Constant.KEY_REFERER_KEY,"");
-
-
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.payment_method_fragment_layout,container,false);
-        initView(view);
-        bindView();
-
-        //Set Up RecyclerView
-        setupRecyclerView(this);
-
-        //Update Font
-        updateFont();
-
-        displayOsVersion();
-
-        return view;
-    }
 
     private void initView(View view){
         textPaymentMethod=view.findViewById(R.id.text_payment_method);
@@ -113,7 +84,8 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
 
     private void updateFont(){
         SetFont font=new SetFont();
-        Typeface typeface=font.setFont(getContext(),"km");
+        Typeface typeface=font.setFont(getContext(),language);
+
         textPaymentMethod.setTypeface(typeface);
         textPaymentMethod.setTextSize(16);
         textPaymentMethod.setPaintFlags(Paint.FAKE_BOLD_TEXT_FLAG);
@@ -132,7 +104,7 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
             adapter.setOnItemClickListener(listener);
             recyclerViewPaymentMethod.setLayoutManager(new LinearLayoutManager(getContext()));
             recyclerViewPaymentMethod.setAdapter(adapter);
-             //Set Header to Sticky
+            //Set Header to Sticky
             StickyHeaderItemDecoration stickyHeaderItemDecoration=new StickyHeaderItemDecoration((StickyHeaderItemDecoration.StickyHeaderInterface)adapter);
             recyclerViewPaymentMethod.addItemDecoration(stickyHeaderItemDecoration);
         }
@@ -148,39 +120,8 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
             e.printStackTrace();
         }
     }
-
-    @Override
-    public void OnItemPaymentMethodClick(BankPaymentMethodItemModel itemModel) {
-        //Toast.makeText(getContext(),"new click"+itemModel.getId(),Toast.LENGTH_SHORT).show();
-
-        ExpiredRequestModel expiredRequestModel=new ExpiredRequestModel(transactionInfoModel.getTranId());
-        GenerateDeeplinkRequestModel generateDeeplinkRequestModel=new GenerateDeeplinkRequestModel(itemModel.getId(),transactionInfoModel.getTranId());
-        switch (itemModel.getId()){
-            case Bank.KHQR:
-                Fragment fragment=getParentFragment();
-                if(fragment !=null && fragment instanceof BottomSheet){
-                    ((BottomSheet)getParentFragment()).showFragment(new KhqrFragment(transactionInfoModel.getTranId()));
-                }
-                break;
-            case Bank.AMK:
-                postExpiredTran(expiredRequestModel);
-                postGenerateDeeplink(generateDeeplinkRequestModel);
-
-
-                //Todo set deeplink and web checkout
-                if(itemModel.isSupportDeeplink()){
-
-                }
-                if(itemModel.isSupportCheckoutPage()){
-                    ((BottomSheet)getParentFragment()).showFragment(new WebViewCheckoutFragment());
-                }
-                break;
-        }
-
-    }
-
     private void postExpiredTran(ExpiredRequestModel model){
-        RequestAPI requestAPI=new RequestAPI(refererKey,language);
+        RequestAPI requestAPI=new RequestAPI(refererKey);
         Call<BaseResponse<ExpiredTransactionModel>> call=requestAPI.postExpireTran(model);
         call.enqueue(new Callback<BaseResponse<ExpiredTransactionModel>>() {
             @Override
@@ -196,29 +137,133 @@ public class PaymentMethodFragment extends Fragment implements PaymentMethodAdap
 
 
     //todo launch deeplink mobile
-   private void launchDeeplink(String url){
-            Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(url));
-            startActivity(intent);
-   }
+    private void launchDeeplink(String url){
+        Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(url));
+        startActivity(intent);
+    }
 
 
-   //todo request deeplink
-   private void postGenerateDeeplink(GenerateDeeplinkRequestModel model){
-        RequestAPI requestAPI=new RequestAPI(refererKey,language);
+    //todo request deeplink
+    private  GenerateLinkDeepLinkModel generateLinkDeepLinkModel;
+    private void postGenerateDeeplink(GenerateDeeplinkRequestModel model){
+        RequestAPI requestAPI=new RequestAPI(refererKey);
         Call<BaseResponse<GenerateLinkDeepLinkModel>> call=requestAPI.postGenerateDeeplink(model);
         call.enqueue(new Callback<BaseResponse<GenerateLinkDeepLinkModel>>() {
             @Override
             public void onResponse(Call<BaseResponse<GenerateLinkDeepLinkModel>> call, Response<BaseResponse<GenerateLinkDeepLinkModel>> response) {
-                response.body();
+                if(response.isSuccessful()){
+                    BaseResponse<GenerateLinkDeepLinkModel> deeplink=response.body();
+                    if(deeplink !=null){
+                        generateLinkDeepLinkModel=deeplink.getData();
+                    }
+                }
             }
 
             @Override
             public void onFailure(Call<BaseResponse<GenerateLinkDeepLinkModel>> call, Throwable t) {
-
+                Toast.makeText(getContext(), ""+t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-   }
+    }
 
+    private void getPreference(){
+        SharedPreferences preferences=getActivity().getPreferences(Context.MODE_PRIVATE);
+        String bankPaymentMethodJson=preferences.getString(Constant.KEY_PAYMENT_METHOD,"");
+        bankPaymentMethodModelList=SharePreferenceCustom.convertFromJsonToListObject(bankPaymentMethodJson,BankPaymentMethodModel.class);
+        String transactionInfoJson=preferences.getString(Constant.KEY_TRANSACTION_INFO,"");
+        transactionInfoModel=SharePreferenceCustom.converJsonToObject(transactionInfoJson, TransactionInfoModel.class);
+
+        //get language
+        language=preferences.getString(Constant.KEY_LANGUAGE_CODE,"");
+        //get refererKey
+        refererKey=preferences.getString(Constant.KEY_REFERER_KEY,"");
+    }
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        connectivityState=new ConnectivityState(this);//Init BroadCastReceiver
+
+        getPreference();
+        ChangLanguage.setLanguage(language,getContext());
+
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view=inflater.inflate(R.layout.payment_method_fragment_layout,container,false);
+        initView(view);
+        //Update Font
+        updateFont();
+
+        bindView();
+
+        //Set Up RecyclerView
+        setupRecyclerView(this);
+
+        displayOsVersion();
+
+        return view;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //unregister broadcast when fragment is pause
+        requireContext().unregisterReceiver(connectivityState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //register broadcast when connectivity change
+        IntentFilter intentFilter=new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        requireContext().registerReceiver(connectivityState,intentFilter);
+
+    }
+
+    @Override
+    public void OnItemPaymentMethodClick(BankPaymentMethodItemModel itemModel) {
+
+        ExpiredRequestModel expiredRequestModel=new ExpiredRequestModel(transactionInfoModel.getTranId());
+        switch (itemModel.getId()){
+            case Bank.KHQR:
+                postExpiredTran(expiredRequestModel);
+                Fragment fragment=getParentFragment();
+                if(fragment !=null && fragment instanceof BottomSheet){
+                    ((BottomSheet)getParentFragment()).showFragment(new KhqrFragment(transactionInfoModel.getTranId()));
+                }
+                break;
+            default:
+                //Toast.makeText(getContext(), ""+itemModel.getId(), Toast.LENGTH_SHORT).show();
+                postExpiredTran(expiredRequestModel);
+                GenerateDeeplinkRequestModel generateDeeplinkRequestModel=new GenerateDeeplinkRequestModel(itemModel.getId(),transactionInfoModel.getTranId());
+                postGenerateDeeplink(generateDeeplinkRequestModel);
+
+                if(itemModel.isSupportDeeplink()){
+                    launchDeeplink(generateLinkDeepLinkModel.getMobileDeepLink());
+                    break;
+                }
+                if(itemModel.isSupportCheckoutPage()){
+                    ((BottomSheet)getParentFragment()).showFragment(new WebViewCheckoutFragment(generateLinkDeepLinkModel.getWebPaymentLink()));
+                    break;
+                }
+
+        }
+
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected, boolean wasResortConnection) {
+        if(isConnected){
+            if(!wasResortConnection){
+                //todo handle display connection restore
+            }
+        }else {
+            //todo handle display lose connection
+        }
+    }
 }
 
 

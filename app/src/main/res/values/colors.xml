@@ -19,4 +19,6 @@
     <color name="douwnload_share_color">#FFD4E8FF</color>
     <color name="loading_indicator_color">#FFA9ADFD</color>
     <color name="payment_method_backgound">#FBFBFB</color>
+    <color name="barrier_color">#5A5A5A</color>
+    <color name="dash_line_color">#D6D6D6</color>
 </resources>

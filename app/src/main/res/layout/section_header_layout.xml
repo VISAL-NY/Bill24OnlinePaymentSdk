@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:paddingLeft="@dimen/dimen_size20"
-    android:layout_marginBottom="@dimen/section_header_margin_bottom"
+    android:layout_marginBottom="11dp"
     >
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text_section_header"

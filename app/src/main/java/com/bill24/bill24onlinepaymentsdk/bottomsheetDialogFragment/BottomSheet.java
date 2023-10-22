@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +20,13 @@ import androidx.fragment.app.Fragment;
 
 import com.bill24.bill24onlinepaymentsdk.R;
 import com.bill24.bill24onlinepaymentsdk.fragment.PaymentMethodFragment;
+import com.bill24.bill24onlinepaymentsdk.helper.ChangLanguage;
 import com.bill24.bill24onlinepaymentsdk.helper.SharePreferenceCustom;
 import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodModel;
 import com.bill24.bill24onlinepaymentsdk.model.CheckoutDetailModel;
 import com.bill24.bill24onlinepaymentsdk.model.TransactionInfoModel;
 import com.bill24.bill24onlinepaymentsdk.model.conts.Constant;
+import com.bill24.bill24onlinepaymentsdk.model.conts.LanguageCode;
 import com.bill24.bill24onlinepaymentsdk.model.core.RequestAPI;
 import com.bill24.bill24onlinepaymentsdk.model.requestModel.CheckoutDetailRequestModel;
 import com.bill24.bill24onlinepaymentsdk.model.baseResponseModel.BaseResponse;
@@ -38,8 +41,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class BottomSheet extends BottomSheetDialogFragment {
-
-    private String transactionId,refererKey,language="";
+    private String transactionId,refererKey,language;
     private CheckoutDetailRequestModel requestModel;
     private FrameLayout progressBarContainer;
     public BottomSheet(String transactionId,String refererKey,String language){
@@ -58,6 +60,7 @@ public class BottomSheet extends BottomSheetDialogFragment {
         progressBarContainer=view.findViewById(R.id.progress_circular);
     }
     public void showFragment(Fragment fragment){
+
         //OLD
 //        Animation enterAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.enter_animation);
 ////        Animation exitAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.exit_animation);
@@ -70,7 +73,9 @@ public class BottomSheet extends BottomSheetDialogFragment {
 //                //R.anim.exit_animation    // Pop-exit animation (for back stack)
 //        );
 //        fragmentTransaction.replace(R.id.content_layout,fragment).commit();
-        //END
+
+// END
+
         getChildFragmentManager()
                 .beginTransaction()
                 .replace(R.id.content_layout,fragment)
@@ -85,7 +90,7 @@ public class BottomSheet extends BottomSheetDialogFragment {
     }
 
     private void postCheckoutDetail(){
-        RequestAPI requestAPI=new RequestAPI(refererKey,language);
+        RequestAPI requestAPI=new RequestAPI(refererKey);
         Call<BaseResponse<CheckoutDetailModel>> call=requestAPI.postCheckoutDetail(requestModel);
         call.enqueue(new Callback<BaseResponse<CheckoutDetailModel>>() {
             @Override
@@ -97,7 +102,10 @@ public class BottomSheet extends BottomSheetDialogFragment {
                         setSharePreference(bankPaymentMethodModelList,transactionInfoModel);//Store value in sharePreference
                         showFragment(new PaymentMethodFragment());//Go to Fragment PaymentMethod
                     }
-                    hideProgressIndicator();//Hide Progress Indicator
+
+                    new Handler().postDelayed(() -> {
+                        hideProgressIndicator();//Hide Progress Indicator
+                    },100);
                 }
             }
             @Override
@@ -119,6 +127,14 @@ public class BottomSheet extends BottomSheetDialogFragment {
         editor.apply();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        if(language==null || language.isEmpty()){
+            language= LanguageCode.KH;
+        }
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -126,9 +142,7 @@ public class BottomSheet extends BottomSheetDialogFragment {
         BottomSheetDialog dialog= (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
         dialog.setOnShowListener(dialogInterface -> {
             BottomSheetDialog d= (BottomSheetDialog) dialogInterface;
-
-            int alpha = (int) (0.65 * 255);
-            int blackColorWith65PercentAlpha = Color.argb(alpha, 0, 0, 0);
+            int blackColorWith65PercentAlpha = Color.argb(Color.alpha(R.color.barrier_color),0,0,0 );
 
             //Set Barrier Color
             d.getWindow().setBackgroundDrawable(new ColorDrawable(blackColorWith65PercentAlpha));
@@ -147,7 +161,9 @@ public class BottomSheet extends BottomSheetDialogFragment {
             //Set Height When Dialog Load
             bottomSheetBehavior.setPeekHeight((int) (screenHeight*1)); // Set the initial peek height
             bottomSheetBehavior.setHideable(true);
+
         });
+
         return dialog;
     }
 
@@ -165,6 +181,4 @@ public class BottomSheet extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
         postCheckoutDetail();
     }
-
-
 }

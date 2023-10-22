@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/try_again"
-        android:background="@drawable/button_click_selected"
+        android:background="@drawable/button_click_state"
         android:textColor="@color/white"
         android:layout_marginHorizontal="@dimen/dimen_size20"
         android:layout_marginTop="@dimen/dimen_size30"

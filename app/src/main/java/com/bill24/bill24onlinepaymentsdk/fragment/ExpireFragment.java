@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.bill24.bill24onlinepaymentsdk.R;
 import com.bill24.bill24onlinepaymentsdk.bottomsheetDialogFragment.BottomSheet;
+import com.bill24.bill24onlinepaymentsdk.helper.ChangLanguage;
 import com.bill24.bill24onlinepaymentsdk.helper.SetFont;
 import com.bill24.bill24onlinepaymentsdk.model.conts.Constant;
 
@@ -29,17 +30,14 @@ public class ExpireFragment extends Fragment {
     public ExpireFragment(String transactionId){
       this.transactionId=transactionId;
     }
-
-
     private void initView(View view){
         buttonTryAgain=view.findViewById(R.id.button_try_again);
         textTranExpired=view.findViewById(R.id.text_expire_title);
         textTryAgain=view.findViewById(R.id.text_try_again_title);
     }
-
     private void updateFont(){
         SetFont font=new SetFont();
-        Typeface typeface=font.setFont(getContext(),"km");
+        Typeface typeface=font.setFont(getContext(),language);
         textTranExpired.setTypeface(typeface);
         textTranExpired.setTextSize(16);
         textTranExpired.setPaintFlags(Paint.FAKE_BOLD_TEXT_FLAG);
@@ -59,6 +57,7 @@ public class ExpireFragment extends Fragment {
         language=preferences.getString(Constant.KEY_LANGUAGE_CODE,"");
         //get refererKey
         refererKey=preferences.getString(Constant.KEY_REFERER_KEY,"");
+        ChangLanguage.setLanguage(language,getContext());
     }
 
     @Nullable

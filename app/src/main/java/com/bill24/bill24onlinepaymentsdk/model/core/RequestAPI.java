@@ -16,27 +16,25 @@ import retrofit2.Call;
 public class RequestAPI {
 
     private final String refererKey;
-    private final String language;
-    public RequestAPI(String refererKey,String language){
+    public RequestAPI(String refererKey){
         this.refererKey=refererKey;
-        this.language=language;
     }
 
     public Call<BaseResponse<CheckoutDetailModel>> postCheckoutDetail(CheckoutDetailRequestModel model){
         return RetrofitClient.getInstance().getApiClient()
-                .postCheckoutDetail(Constant.CONTENT_TYPE,Constant.TOKEN,refererKey,language,model);
+                .postCheckoutDetail(Constant.CONTENT_TYPE,Constant.TOKEN,refererKey,model);
     }
 
     public  Call<BaseResponse<ExpiredTransactionModel>> postExpireTran(ExpiredRequestModel model){
         return  RetrofitClient.getInstance().getApiClient().
-                        postExpiredTransaction(Constant.CONTENT_TYPE,Constant.TOKEN,refererKey,language,model);
+                        postExpiredTransaction(Constant.CONTENT_TYPE,Constant.TOKEN,refererKey,model);
     }
     public Call<BaseResponse<GenerateLinkDeepLinkModel>> postGenerateDeeplink(GenerateDeeplinkRequestModel model){
         return RetrofitClient.getInstance().getApiClient().
-                postGenerateDeepLink(Constant.CONTENT_TYPE,Constant.TOKEN,refererKey,language,model);
+                postGenerateDeepLink(Constant.CONTENT_TYPE,Constant.TOKEN,refererKey,model);
     }
     public Call<BaseResponse<AddToFavoriteModel>> postAddToFavorite(AddToFavoriteRequestModel model){
         return RetrofitClient.getInstance().getApiClient().
-                postAddToFavorite(Constant.CONTENT_TYPE,Constant.TOKEN,refererKey,language,model);
+                postAddToFavorite(Constant.CONTENT_TYPE,Constant.TOKEN,refererKey,model);
     }
 }

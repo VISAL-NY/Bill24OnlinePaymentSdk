@@ -42,8 +42,10 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     //Spinkit Loading
     implementation("com.wang.avi:library:2.1.3")
-    //Picaso Loading image
+    //Picasso Loading image
     implementation("com.squareup.picasso:picasso:2.8")
+//    implementation("com.github.bumptech.glide:glide:4.16.0")
+//    annotationProcessor("com.github.bumptech.glide:glide:4.16.0")
     //Convert Data Object to Gson
     implementation("com.google.code.gson:gson:2.10.1")
     //http log

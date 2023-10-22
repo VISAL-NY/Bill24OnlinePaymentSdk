@@ -8,11 +8,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bill24.bill24onlinepaymentsdk.bottomsheetDialogFragment.BottomSheet;
 import com.bill24.bill24onlinepaymentsdk.model.main.Bill24OnlinePayment;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_layout);
         Button button=findViewById(R.id.button);
         Spinner spinner=findViewById(R.id.transaction_id);
+
+
 
         List<String> items=new ArrayList<>();
         items.add("1");
@@ -61,6 +65,12 @@ public class MainActivity extends AppCompatActivity {
 
             Bill24OnlinePayment bill24OnlinePayment=new Bill24OnlinePayment();
             bill24OnlinePayment.showBottomSheet(getSupportFragmentManager(),transactionId,"123","en");
+
+
+
+
+
+
         });
     }
 }

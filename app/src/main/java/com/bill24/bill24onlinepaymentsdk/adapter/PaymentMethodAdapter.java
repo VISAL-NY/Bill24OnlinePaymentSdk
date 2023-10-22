@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -24,16 +23,17 @@ import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodItemModel;
 import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodModel;
 import com.bill24.bill24onlinepaymentsdk.model.baseResponseModel.BaseResponse;
 import com.bill24.bill24onlinepaymentsdk.model.conts.Constant;
+import com.bill24.bill24onlinepaymentsdk.model.conts.LanguageCode;
 import com.bill24.bill24onlinepaymentsdk.model.core.RetrofitClient;
 import com.bill24.bill24onlinepaymentsdk.model.requestModel.AddToFavoriteRequestModel;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements StickyHeaderItemDecoration.StickyHeaderInterface {
@@ -71,7 +71,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private void updateHeaderFont(Context context){
         SetFont font=new SetFont();
-        Typeface typeface=font.setFont(context, "km");
+        Typeface typeface=font.setFont(context, language);
         textSectionHeader.setTypeface(typeface);
         textSectionHeader.setTextSize(11);
         textSectionHeader.setPaintFlags(Paint.FAKE_BOLD_TEXT_FLAG);
@@ -90,7 +90,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
     private void postAddToFavorite(String bankId,boolean isFavorite){
         AddToFavoriteRequestModel model=new AddToFavoriteRequestModel(tranasctionId,bankId,isFavorite);
         Call<BaseResponse<AddToFavoriteModel>> call= RetrofitClient.getInstance().
-                getApiClient().postAddToFavorite(Constant.CONTENT_TYPE,Constant.TOKEN,refererKey,language,model);
+                getApiClient().postAddToFavorite(Constant.CONTENT_TYPE,Constant.TOKEN,refererKey,model);
 
         call.enqueue(new Callback<BaseResponse<AddToFavoriteModel>>() {
             @Override
@@ -104,8 +104,6 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
             }
         });
     }
-
-
 
     @NonNull
     @Override
@@ -139,10 +137,8 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
             if (currentPos == position) {
                 return VIEW_HEADER_TYPE;
             }
-
             // Increment the position to account for the section
             currentPos++;
-
             // Check if the current position corresponds to an item within the section
             if (section.getItems() != null) {
                 for (BankPaymentMethodItemModel item : section.getItems()) {
@@ -180,14 +176,12 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         int currentPos = 0;
-
         for (BankPaymentMethodModel section : bankPaymentMethodModelList) {
             if (currentPos == position) {
                 // Bind data for section
                 ((SectionViewHolder) holder).bindSection(section);
                 return; // Exit the method after binding the section
             }
-
             currentPos++;
 
             if (section.getItems() != null) {
@@ -198,6 +192,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                         //Set Item Click Event
                         holder.itemView.setOnClickListener(v->{
+                            //Toast.makeText(v.getContext(), ""+item.getId(), Toast.LENGTH_SHORT).show();
                             listener.OnItemPaymentMethodClick(item);
                         });
 
@@ -220,7 +215,6 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
                             }
 
                         });
-
 
                         return; // Exit the method after binding the item
                     }
@@ -272,8 +266,6 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
    // }
     // END OLD CODE
 
-
-
     @Override
     public int getItemCount()
     {
@@ -291,33 +283,40 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
     public int getHeaderPositionForItem(int itemPosition) {
        int headerPosition=0;
         do{
-                if(this.isHeader(itemPosition)){
-                    headerPosition=itemPosition;
-                }
-                itemPosition-=1;
+            if(this.isHeader(itemPosition)){
+                headerPosition=itemPosition;
+            }
+            itemPosition-=1;
         }while (itemPosition>=0);
         return headerPosition;
     }
 
     @Override
+    public boolean isHeader(int itemPosition) {
+        if(itemPosition >= bankPaymentMethodModelList.size()){
+            return false;
+        }else {
+            return true;
+//            BankPaymentMethodItemModel item=bankPaymentMethodModelList.get(itemPosition).getItems().get(itemPosition);
+//            return item.getName() !=null && item.getId()==null;
+        }
+    }
+
+    @Override
     public int getHeaderLayout(int headerPosition) {
-        return R.layout.section_header_layout;
+      return R.layout.section_header_layout;
     }
 
     @Override
     public void bindHeaderData(View header, int headerPosition) {
        textSectionHeader=header.findViewById(R.id.text_section_header);
-       textSectionHeader.setText(bankPaymentMethodModelList.get(headerPosition).getSectionKh());
-       updateHeaderFont(header.getContext());
-    }
+       if(language.equals(LanguageCode.EN)){
+           textSectionHeader.setText(bankPaymentMethodModelList.get(headerPosition).getSection());
+       }else {
+           textSectionHeader.setText(bankPaymentMethodModelList.get(headerPosition).getSectionKh());
 
-    @Override
-    public boolean isHeader(int itemPosition) {
-       if(itemPosition >= bankPaymentMethodModelList.size()){
-           return false;
        }
-       BankPaymentMethodItemModel item=bankPaymentMethodModelList.get(itemPosition).getItems().get(itemPosition);
-       return item.getName() !=null && item.getId()==null;
+       updateHeaderFont(header.getContext());
     }
 
 
@@ -328,7 +327,12 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
             textSection=itemView.findViewById(R.id.text_section_header);
         }
         void bindSection(BankPaymentMethodModel section){
-            textSection.setText(section.getSectionKh());
+            if(language.equals(LanguageCode.EN)){
+                textSection.setText(section.getSection());
+            }else {
+                textSection.setText(section.getSectionKh());
+            }
+
         }
     }
 
@@ -348,9 +352,19 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         @SuppressLint("SetTextI18n")
         void bindItem(BankPaymentMethodItemModel bankPaymentMethodItemModel){
-            textBankName.setText(bankPaymentMethodItemModel.getName());
+            if(language.equals(LanguageCode.EN)){
+                textBankName.setText(bankPaymentMethodItemModel.getName());
+            }else {
+                textBankName.setText(bankPaymentMethodItemModel.getNameKh());
+            }
             textBankServicePayment_Amount.setText(String.valueOf(bankPaymentMethodItemModel.getFee()));
-            Picasso.get().load(bankPaymentMethodItemModel.getLogo()).placeholder(R.drawable.placeholder_image).into(imageBankIcon);
+
+            int cornerRadius = 60; // Adjust the radius as needed
+
+            Picasso.get().load(bankPaymentMethodItemModel.getLogo())
+                    .placeholder(R.drawable.placeholder_image)
+                    .into(imageBankIcon);
+
             if(bankPaymentMethodItemModel.isFavorite()){
                 imageFavIcon.setImageResource(R.drawable.is_favorite_icon);
             }else {

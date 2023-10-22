@@ -10,12 +10,12 @@ import java.util.Locale;
 
 public class ChangLanguage {
     public static void setLanguage(String languageCode,Context context){
+
         Locale locale;
         if(languageCode.equals(LanguageCode.EN)){
             locale=new Locale(LanguageCode.EN);
         }else {
             locale=new Locale(LanguageCode.KH);
-
         }
         Locale.setDefault(locale);
         Resources resources=context.getResources();

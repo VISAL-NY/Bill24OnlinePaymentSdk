@@ -21,14 +21,12 @@ public interface ApiClient {
             @Header("Content-Type") String contentType,
             @Header("token") String token,
             @Header("Referer-Key") String refererKey,
-            @Header("language") String language,
             @Body CheckoutDetailRequestModel requestModel);
     @POST("checkout/generatelinks")
     Call<BaseResponse<GenerateLinkDeepLinkModel>> postGenerateDeepLink(
             @Header("Content-Type") String contentType,
             @Header("token") String token,
             @Header("Referer-Key") String refererKey,
-            @Header("language") String language,
             @Body GenerateDeeplinkRequestModel requestModel
     );
 
@@ -37,7 +35,6 @@ public interface ApiClient {
             @Header("Content-Type") String contentType,
             @Header("token") String token,
             @Header("Referer-Key") String refererKey,
-            @Header("language") String language,
             @Body ExpiredRequestModel requestModel
             );
     @POST("transaction/favorite")
@@ -45,7 +42,6 @@ public interface ApiClient {
             @Header("Content-Type") String contentType,
             @Header("token") String token,
             @Header("Referer-Key") String refererKey,
-            @Header("language") String language,
             @Body AddToFavoriteRequestModel requestModel
     );
 
