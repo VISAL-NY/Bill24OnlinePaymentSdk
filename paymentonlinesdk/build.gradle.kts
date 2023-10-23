@@ -1,25 +1,25 @@
 plugins {
-    id("com.android.application")
+    id("com.android.library")
 }
 
 android {
-    namespace = "com.bill24.bill24onlinepaymentsdk"
+    namespace = "com.bill24.paymentonlinesdk"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.bill24.bill24onlinepaymentsdk"
-        minSdk = 22
-        targetSdk = 33
-        versionCode = 1
-        versionName = "1.0.0"
+        minSdk = 24
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
@@ -31,7 +31,8 @@ android {
 dependencies {
 
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.10.0")
+    implementation(project(mapOf("path" to ":app")))
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -47,5 +48,5 @@ dependencies {
     //Convert Data Object to Gson
     implementation("com.google.code.gson:gson:2.10.1")
     //http log
-    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+    //implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 }

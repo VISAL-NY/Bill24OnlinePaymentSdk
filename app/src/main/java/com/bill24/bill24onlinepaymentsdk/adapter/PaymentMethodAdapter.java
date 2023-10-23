@@ -2,17 +2,28 @@ package com.bill24.bill24onlinepaymentsdk.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bill24.bill24onlinepaymentsdk.R;
@@ -21,15 +32,20 @@ import com.bill24.bill24onlinepaymentsdk.helper.StickyHeaderItemDecoration;
 import com.bill24.bill24onlinepaymentsdk.model.AddToFavoriteModel;
 import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodItemModel;
 import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodModel;
+import com.bill24.bill24onlinepaymentsdk.model.TransactionInfoModel;
 import com.bill24.bill24onlinepaymentsdk.model.baseResponseModel.BaseResponse;
 import com.bill24.bill24onlinepaymentsdk.model.conts.Constant;
+import com.bill24.bill24onlinepaymentsdk.model.conts.CurrencyCode;
 import com.bill24.bill24onlinepaymentsdk.model.conts.LanguageCode;
 import com.bill24.bill24onlinepaymentsdk.model.core.RetrofitClient;
 import com.bill24.bill24onlinepaymentsdk.model.requestModel.AddToFavoriteRequestModel;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,6 +56,8 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private static final int VIEW_HEADER_TYPE=0;
     private static final int VIEW_ITEM_TYPE=1;
+
+    private TransactionInfoModel transactionInfoModel;
     private List<BankPaymentMethodModel> bankPaymentMethodModelList;
     private PaymentMethodClickListener listener;
     private AppCompatTextView textSectionHeader,
@@ -47,10 +65,12 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
     private String tranasctionId, refererKey,language;
 
    public void setPaymentMethod(
+           TransactionInfoModel transactionInfoModel,
            List<BankPaymentMethodModel> bankPaymentMethodModelList,
            String transactionId,
            String refererKey,
            String language){
+       this.transactionInfoModel=transactionInfoModel;
        this.bankPaymentMethodModelList=bankPaymentMethodModelList;
        this.tranasctionId=transactionId;
        this.refererKey=refererKey;
@@ -69,7 +89,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
         textCurrency=view.findViewById(R.id.text_payment_service_amount);
     }
 
-    private void updateHeaderFont(Context context){
+    private void updateHeaderFont(Context context,AppCompatTextView textSectionHeader){
         SetFont font=new SetFont();
         Typeface typeface=font.setFont(context, language);
         textSectionHeader.setTypeface(typeface);
@@ -79,7 +99,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     private void updateItemFont(Context context){
-//        SetFont font=new SetFont();
+//      SetFont font=new SetFont();
         Typeface bankNameTypeface= ResourcesCompat.getFont(context, R.font.roboto_medium);
         textBankName.setTypeface(bankNameTypeface);
         textBankName.setTextSize(12);
@@ -113,7 +133,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
             View view=inflater.inflate(R.layout.section_header_layout,parent,false);
             textSectionHeader=view.findViewById(R.id.text_section_header);
             //Update Font
-            updateHeaderFont(view.getContext());
+            updateHeaderFont(view.getContext(),textSectionHeader);
 
             return new SectionViewHolder(view);
         }else {
@@ -206,7 +226,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
                             if(isFav){
                                 //Toast.makeText(v.getContext(), ""+isFav, Toast.LENGTH_SHORT).show();
                                 postAddToFavorite(item.getId(),isFav);
-                                ((BankItemViewHolder)holder).imageFavIcon.setImageResource(R.drawable.is_favorite_icon);
+                                ((BankItemViewHolder)holder).imageFavIcon.setImageResource(R.drawable.favorite_icon);
 
                             }else {
                                 //Toast.makeText(v.getContext(), ""+isFav, Toast.LENGTH_SHORT).show();
@@ -285,6 +305,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
         do{
             if(this.isHeader(itemPosition)){
                 headerPosition=itemPosition;
+                break;
             }
             itemPosition-=1;
         }while (itemPosition>=0);
@@ -293,30 +314,76 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public boolean isHeader(int itemPosition) {
-        if(itemPosition >= bankPaymentMethodModelList.size()){
-            return false;
-        }else {
-            return true;
-//            BankPaymentMethodItemModel item=bankPaymentMethodModelList.get(itemPosition).getItems().get(itemPosition);
-//            return item.getName() !=null && item.getId()==null;
+        int currentPos = 0;
+
+        for (BankPaymentMethodModel section : bankPaymentMethodModelList) {
+            if (itemPosition == currentPos) {
+                return true; // This item is a section header
+            }
+            currentPos++; // Move to the next position
+            if (section.getItems() != null) {
+                // Check if the current itemPosition is within the range of this section's items
+                if (itemPosition < currentPos + section.getItems().size()) {
+                    return false; // This item is not a section header
+                }
+                // Increment currentPos to move to the next section
+                currentPos += section.getItems().size();
+            }
         }
+        return false;
+
+        //#OLD
+//        if(itemPosition >= bankPaymentMethodModelList.size()){
+//            return false;
+//        }else {
+//            return true;
+////            BankPaymentMethodItemModel item=bankPaymentMethodModelList.get(itemPosition).getItems().get(itemPosition);
+////            return item.getName() !=null && item.getId()==null;
+//        }
+        //#END
     }
 
     @Override
     public int getHeaderLayout(int headerPosition) {
-      return R.layout.section_header_layout;
+       return R.layout.section_header_layout;
     }
 
     @Override
     public void bindHeaderData(View header, int headerPosition) {
-       textSectionHeader=header.findViewById(R.id.text_section_header);
-       if(language.equals(LanguageCode.EN)){
-           textSectionHeader.setText(bankPaymentMethodModelList.get(headerPosition).getSection());
-       }else {
-           textSectionHeader.setText(bankPaymentMethodModelList.get(headerPosition).getSectionKh());
+        int currentPos = 0;
+        AppCompatTextView textSectionHeader = header.findViewById(R.id.text_section_header);
+        for (BankPaymentMethodModel section : bankPaymentMethodModelList) {
+            if (currentPos == headerPosition) {
+                if (language.equals(LanguageCode.EN)) {
+                    textSectionHeader.setText(section.getSection());
+                } else {
+                    textSectionHeader.setText(section.getSectionKh());
+                }
+                updateHeaderFont(header.getContext(),textSectionHeader);
+                return;
+            }
+            currentPos++; // Move to the next position
+            if (section.getItems() != null) {
+                int itemCount = section.getItems().size();
+                if (headerPosition < currentPos + itemCount) {
+                    // This is not a header; it's within the items of the current section
+                    return;
+                }
+                currentPos += itemCount;
+            }
+        }
 
-       }
-       updateHeaderFont(header.getContext());
+    //OLD
+//       textSectionHeader=header.findViewById(R.id.text_section_header);
+//       if(language.equals(LanguageCode.EN)){
+//           textSectionHeader.setText(bankPaymentMethodModelList.get(headerPosition).getSection());
+//       }else {
+//           textSectionHeader.setText(bankPaymentMethodModelList.get(headerPosition).getSectionKh());
+//
+//       }
+       //updateHeaderFont(header.getContext());
+
+        //END
     }
 
 
@@ -337,7 +404,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
    public  class  BankItemViewHolder extends RecyclerView.ViewHolder {
-        private AppCompatTextView textBankName,textBankServicePayment_Amount;
+        private AppCompatTextView textBankName,textBankServicePayment_Amount,textBankServiceCurrency;
         private AppCompatImageView imageFavIcon, imageBankIcon;
         private FrameLayout addToFavoriteContainer;
         public BankItemViewHolder(@NonNull View itemView) {
@@ -348,6 +415,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
             imageFavIcon=itemView.findViewById(R.id.image_favorite_icon);
             imageBankIcon =itemView.findViewById(R.id.image_bank_icon);
             addToFavoriteContainer=itemView.findViewById(R.id.add_to_favorite_container);
+            textBankServiceCurrency=itemView.findViewById(R.id.text_payment_service_currency);
         }
 
         @SuppressLint("SetTextI18n")
@@ -357,16 +425,27 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
             }else {
                 textBankName.setText(bankPaymentMethodItemModel.getNameKh());
             }
-            textBankServicePayment_Amount.setText(String.valueOf(bankPaymentMethodItemModel.getFee()));
 
-            int cornerRadius = 60; // Adjust the radius as needed
 
+
+
+
+            //textBankServicePayment_Amount.setText(String.valueOf(bankPaymentMethodItemModel.getFee()));
+
+            textBankServicePayment_Amount.setText(formatCurrency(bankPaymentMethodItemModel.getFee(),transactionInfoModel.getCurrency()));
+
+
+            if(transactionInfoModel.getCurrency().equals(CurrencyCode.USD)){
+                textBankServiceCurrency.setText(CurrencyCode.USD);
+            }else {
+                textBankServiceCurrency.setText(CurrencyCode.KHR);
+            }
             Picasso.get().load(bankPaymentMethodItemModel.getLogo())
                     .placeholder(R.drawable.placeholder_image)
-                    .into(imageBankIcon);
+                    .into(imageBankIcon) ;
 
             if(bankPaymentMethodItemModel.isFavorite()){
-                imageFavIcon.setImageResource(R.drawable.is_favorite_icon);
+                imageFavIcon.setImageResource(R.drawable.favorite_icon);
             }else {
                 imageFavIcon.setImageResource(R.drawable.un_favorite_icon);
             }
@@ -374,5 +453,17 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
     public interface PaymentMethodClickListener{
        void OnItemPaymentMethodClick(BankPaymentMethodItemModel id);
+    }
+
+
+    private String formatCurrency(double amount,String currency){
+        NumberFormat currencyFormat=NumberFormat.getNumberInstance();
+        if(currency.equals(CurrencyCode.KHR)){
+            return currencyFormat.format(amount);
+        }else {
+            DecimalFormat decimalFormat=new DecimalFormat("#,##0.00");
+            return  decimalFormat.format(amount);
+        }
+
     }
 }

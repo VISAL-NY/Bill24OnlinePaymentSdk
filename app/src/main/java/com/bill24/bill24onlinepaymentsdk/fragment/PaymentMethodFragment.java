@@ -14,11 +14,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,6 +48,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -61,6 +64,7 @@ public class PaymentMethodFragment extends Fragment
     private AppCompatTextView textVersion,
             textTotalAmount,textCurrency,textPaymentMethod,
             textTotalAmountTitle;
+    private LinearLayoutCompat containerPaymentMethod;
     private List<BankPaymentMethodModel> bankPaymentMethodModelList;
     private TransactionInfoModel transactionInfoModel;
     private String refererKey,language;
@@ -75,6 +79,7 @@ public class PaymentMethodFragment extends Fragment
         textVersion=view.findViewById(R.id.text_version);
         textCurrency=view.findViewById(R.id.text_total_amount_currency);
         textTotalAmount =view.findViewById(R.id.text_total_amount);
+        containerPaymentMethod=view.findViewById(R.id.container_payment_method);
     }
 
     private void bindView(){
@@ -94,13 +99,41 @@ public class PaymentMethodFragment extends Fragment
         textTotalAmountTitle.setTypeface(typeface);
         textTotalAmountTitle.setTextSize(10);
 
-
     }
 
     private void setupRecyclerView(PaymentMethodAdapter.PaymentMethodClickListener listener){
+//        List<BankPaymentMethodItemModel> bankPaymentMethodItemModels=new ArrayList<>();
+//        bankPaymentMethodItemModels.add(new BankPaymentMethodItemModel("MASTERCARD","Credit or Debit Card"));
+//
+//        List<BankPaymentMethodItemModel> bankPaymentMethodItemModels1=new ArrayList<>();
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
+//
+//
+//
+//        List<BankPaymentMethodModel> bankPaymentMethodModelList1=new ArrayList<>();
+//        bankPaymentMethodModelList1.add(new BankPaymentMethodModel("KHQR or Credit/Debit Card",bankPaymentMethodItemModels));
+//        bankPaymentMethodModelList1.add(new BankPaymentMethodModel("Bank Payment",bankPaymentMethodItemModels1));
+
+
+
         if(bankPaymentMethodModelList !=null && !bankPaymentMethodModelList.isEmpty()){
             PaymentMethodAdapter adapter=new PaymentMethodAdapter();
-            adapter.setPaymentMethod(bankPaymentMethodModelList,transactionInfoModel.getTranId(),refererKey,language);
+            adapter.setPaymentMethod(transactionInfoModel,bankPaymentMethodModelList,transactionInfoModel.getTranId(),refererKey,language);
             adapter.setOnItemClickListener(listener);
             recyclerViewPaymentMethod.setLayoutManager(new LinearLayoutManager(getContext()));
             recyclerViewPaymentMethod.setAdapter(adapter);
@@ -142,30 +175,6 @@ public class PaymentMethodFragment extends Fragment
         startActivity(intent);
     }
 
-
-    //todo request deeplink
-    private  GenerateLinkDeepLinkModel generateLinkDeepLinkModel;
-    private void postGenerateDeeplink(GenerateDeeplinkRequestModel model){
-        RequestAPI requestAPI=new RequestAPI(refererKey);
-        Call<BaseResponse<GenerateLinkDeepLinkModel>> call=requestAPI.postGenerateDeeplink(model);
-        call.enqueue(new Callback<BaseResponse<GenerateLinkDeepLinkModel>>() {
-            @Override
-            public void onResponse(Call<BaseResponse<GenerateLinkDeepLinkModel>> call, Response<BaseResponse<GenerateLinkDeepLinkModel>> response) {
-                if(response.isSuccessful()){
-                    BaseResponse<GenerateLinkDeepLinkModel> deeplink=response.body();
-                    if(deeplink !=null){
-                        generateLinkDeepLinkModel=deeplink.getData();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<BaseResponse<GenerateLinkDeepLinkModel>> call, Throwable t) {
-                Toast.makeText(getContext(), ""+t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     private void getPreference(){
         SharedPreferences preferences=getActivity().getPreferences(Context.MODE_PRIVATE);
         String bankPaymentMethodJson=preferences.getString(Constant.KEY_PAYMENT_METHOD,"");
@@ -194,6 +203,14 @@ public class PaymentMethodFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.payment_method_fragment_layout,container,false);
         initView(view);
+
+        //set container of webview height to 90%
+        int screenHeight=getResources().getDisplayMetrics().heightPixels;
+        int newHeight=(int) (screenHeight*0.9);
+        LinearLayoutCompat.LayoutParams layoutParams=new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,newHeight);
+        containerPaymentMethod.setLayoutParams(layoutParams);
+
+
         //Update Font
         updateFont();
 
@@ -220,7 +237,6 @@ public class PaymentMethodFragment extends Fragment
         //register broadcast when connectivity change
         IntentFilter intentFilter=new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         requireContext().registerReceiver(connectivityState,intentFilter);
-
     }
 
     @Override
@@ -236,21 +252,32 @@ public class PaymentMethodFragment extends Fragment
                 }
                 break;
             default:
-                //Toast.makeText(getContext(), ""+itemModel.getId(), Toast.LENGTH_SHORT).show();
                 postExpiredTran(expiredRequestModel);
-                GenerateDeeplinkRequestModel generateDeeplinkRequestModel=new GenerateDeeplinkRequestModel(itemModel.getId(),transactionInfoModel.getTranId());
-                postGenerateDeeplink(generateDeeplinkRequestModel);
+                GenerateDeeplinkRequestModel generateDeeplinkRequestModel=new GenerateDeeplinkRequestModel(itemModel.getId(),"2DCDFE54ED2F");
 
-                if(itemModel.isSupportDeeplink()){
-                    launchDeeplink(generateLinkDeepLinkModel.getMobileDeepLink());
-                    break;
-                }
-                if(itemModel.isSupportCheckoutPage()){
-                    ((BottomSheet)getParentFragment()).showFragment(new WebViewCheckoutFragment(generateLinkDeepLinkModel.getWebPaymentLink()));
-                    break;
-                }
-
-        }
+                RequestAPI requestAPI=new RequestAPI(refererKey);
+                Call<BaseResponse<GenerateLinkDeepLinkModel>> call=requestAPI.postGenerateDeeplink(generateDeeplinkRequestModel);
+                call.enqueue(new Callback<BaseResponse<GenerateLinkDeepLinkModel>>() {
+                    @Override
+                    public void onResponse(Call<BaseResponse<GenerateLinkDeepLinkModel>> call, Response<BaseResponse<GenerateLinkDeepLinkModel>> response) {
+                        GenerateLinkDeepLinkModel generateLinkDeepLinkModel;
+                        if(response.isSuccessful()){
+                            BaseResponse<GenerateLinkDeepLinkModel> deeplink=response.body();
+                            if(deeplink !=null){
+                                generateLinkDeepLinkModel=deeplink.getData();
+                                if(itemModel.isSupportDeeplink()){
+                                    launchDeeplink(generateLinkDeepLinkModel.getMobileDeepLink());
+                                }
+                                ((BottomSheet)getParentFragment()).showFragment(new WebViewCheckoutFragment(generateLinkDeepLinkModel.getWebPaymentLink()));
+                            }
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<BaseResponse<GenerateLinkDeepLinkModel>> call, Throwable t) {
+                        Toast.makeText(getContext(), ""+t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
 
     }
 
@@ -259,9 +286,12 @@ public class PaymentMethodFragment extends Fragment
         if(isConnected){
             if(!wasResortConnection){
                 //todo handle display connection restore
+                //Toast.makeText(getContext(), "have internet", Toast.LENGTH_SHORT).show();
             }
         }else {
             //todo handle display lose connection
+            //Toast.makeText(getContext(), "no internet", Toast.LENGTH_SHORT).show();
+
         }
     }
 }

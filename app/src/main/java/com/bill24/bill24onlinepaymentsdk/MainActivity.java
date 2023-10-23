@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
 //                BottomSheet bottomSheet=new BottomSheet();
 //                bottomSheet.show(getSupportFragmentManager(),bottomSheet.getTag());
 
+            transactionId="67f74e8a-9ab6-4bc7-a265-7ee743fea18d";
             Bill24OnlinePayment bill24OnlinePayment=new Bill24OnlinePayment();
             bill24OnlinePayment.showBottomSheet(getSupportFragmentManager(),transactionId,"123","en");
 

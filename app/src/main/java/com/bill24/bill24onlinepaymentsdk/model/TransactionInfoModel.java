@@ -198,6 +198,8 @@ public class TransactionInfoModel implements Serializable {
         this.bankPaymentMethod = bankPaymentMethod;
     }
 
+    public TransactionInfoModel(){}
+
     public TransactionInfoModel(String customerName,String currency,String khqrImage,String totalAmountDisplay){
         this.customerName=customerName;
         this.currency=currency;

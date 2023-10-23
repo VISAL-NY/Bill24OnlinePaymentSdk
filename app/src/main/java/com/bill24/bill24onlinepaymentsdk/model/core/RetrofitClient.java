@@ -1,5 +1,6 @@
 package com.bill24.bill24onlinepaymentsdk.model.core;
 
+import com.bill24.bill24onlinepaymentsdk.model.baseUrl.BaseUrl;
 import com.bill24.bill24onlinepaymentsdk.model.conts.Constant;
 
 import okhttp3.OkHttpClient;
@@ -18,7 +19,7 @@ public class RetrofitClient {
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         httpClient.addInterceptor(loggingInterceptor);
 
-        Retrofit retrofit=new Retrofit.Builder().baseUrl(Constant.BASE_URL)
+        Retrofit retrofit=new Retrofit.Builder().baseUrl(BaseUrl.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient.build()).build();
         apiClient=retrofit.create(ApiClient.class);

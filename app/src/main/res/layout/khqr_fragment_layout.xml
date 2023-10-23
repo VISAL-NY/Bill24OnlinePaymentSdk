@@ -33,6 +33,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/dimen_size20"
                     android:layout_marginBottom="18dp"
+                    android:textColor="@color/black"
                     />
 
                 <!--dash line-->

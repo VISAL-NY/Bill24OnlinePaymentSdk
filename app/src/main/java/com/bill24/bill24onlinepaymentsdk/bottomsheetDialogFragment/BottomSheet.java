@@ -34,6 +34,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -60,22 +61,6 @@ public class BottomSheet extends BottomSheetDialogFragment {
         progressBarContainer=view.findViewById(R.id.progress_circular);
     }
     public void showFragment(Fragment fragment){
-
-        //OLD
-//        Animation enterAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.enter_animation);
-////        Animation exitAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.exit_animation);
-//        FragmentManager fragmentManager=getChildFragmentManager();
-//        FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
-//        fragmentTransaction.setCustomAnimations(
-//                R.anim.enter_animation,  // Enter animation
-//                //R.anim.exit_animation,   // Exit animation
-//                R.anim.enter_animation // Pop-enter animation (for back stack)
-//                //R.anim.exit_animation    // Pop-exit animation (for back stack)
-//        );
-//        fragmentTransaction.replace(R.id.content_layout,fragment).commit();
-
-// END
-
         getChildFragmentManager()
                 .beginTransaction()
                 .replace(R.id.content_layout,fragment)
@@ -83,6 +68,11 @@ public class BottomSheet extends BottomSheetDialogFragment {
     }
 
     private void showProgressIndicator(){
+        int screenHeight=getResources().getDisplayMetrics().heightPixels;
+        int newHeight=(int) (screenHeight*0.9);
+        FrameLayout.LayoutParams layoutParams=new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,newHeight);
+        progressBarContainer.setLayoutParams(layoutParams);
+
         progressBarContainer.setVisibility(View.VISIBLE);
     }
     private void hideProgressIndicator(){
@@ -96,8 +86,22 @@ public class BottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onResponse(Call<BaseResponse<CheckoutDetailModel>> call, Response<BaseResponse<CheckoutDetailModel>> response) {
                 if(response.isSuccessful()){
-                    List<BankPaymentMethodModel> bankPaymentMethodModelList=response.body().getData().getTransInfo().getBankPaymentMethod();
-                    TransactionInfoModel transactionInfoModel=response.body().getData().getTransInfo();
+                    List<BankPaymentMethodModel> bankPaymentMethodModelList=
+                                (   response.body() !=null &&
+                                    response.body().getData() !=null &&
+                                    response.body().getData().getTransInfo() !=null &&
+                                        response.body().getData().getTransInfo().getBankPaymentMethod() !=null
+                                    ) ?
+
+                            response.body().getData().getTransInfo().getBankPaymentMethod() : new ArrayList<>();
+                    TransactionInfoModel transactionInfoModel=
+                                         (
+                                            response.body() !=null &&
+                                            response.body().getData() !=null &&
+                                            response.body().getData().getTransInfo()!=null
+                                            ) ?
+                            response.body().getData().getTransInfo() : new TransactionInfoModel();
+
                     if(!bankPaymentMethodModelList.isEmpty()){
                         setSharePreference(bankPaymentMethodModelList,transactionInfoModel);//Store value in sharePreference
                         showFragment(new PaymentMethodFragment());//Go to Fragment PaymentMethod

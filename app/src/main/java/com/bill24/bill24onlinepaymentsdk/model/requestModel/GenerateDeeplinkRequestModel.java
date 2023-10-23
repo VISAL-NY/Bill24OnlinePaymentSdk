@@ -11,21 +11,21 @@ public class GenerateDeeplinkRequestModel {
         this.bankId = bankId;
     }
 
-    public String getTransactionId() {
-        return transactionId;
+    public String getTransactionNo() {
+        return transactionNo;
     }
 
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
+    public void setTransactionNo(String transactionNo) {
+        this.transactionNo = transactionNo;
     }
 
     public GenerateDeeplinkRequestModel(String bankId, String transactionId) {
         this.bankId = bankId;
-        this.transactionId = transactionId;
+        this.transactionNo = transactionId;
     }
 
     @SerializedName("bank_id")
     private String bankId;
     @SerializedName("transaction_id")
-    private String transactionId;
+    private String transactionNo;
 }
