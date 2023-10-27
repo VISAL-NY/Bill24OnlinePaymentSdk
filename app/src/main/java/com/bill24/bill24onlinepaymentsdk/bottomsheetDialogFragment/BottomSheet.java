@@ -20,13 +20,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.fragment.app.Fragment;
 
 
 import com.bill24.bill24onlinepaymentsdk.R;
-import com.bill24.bill24onlinepaymentsdk.SuccessActivity;
 import com.bill24.bill24onlinepaymentsdk.fragment.PaymentMethodFragment;
 import com.bill24.bill24onlinepaymentsdk.helper.ConvertColorHexa;
 import com.bill24.bill24onlinepaymentsdk.helper.SharePreferenceCustom;
@@ -34,8 +32,6 @@ import com.bill24.bill24onlinepaymentsdk.model.BankPaymentMethodModel;
 import com.bill24.bill24onlinepaymentsdk.model.CheckoutDetailModel;
 import com.bill24.bill24onlinepaymentsdk.model.CheckoutPageConfigModel;
 import com.bill24.bill24onlinepaymentsdk.model.TransactionInfoModel;
-import com.bill24.bill24onlinepaymentsdk.model.appearance.darkMode.DarkModeModel;
-import com.bill24.bill24onlinepaymentsdk.model.appearance.lightMode.LightModeModel;
 import com.bill24.bill24onlinepaymentsdk.model.conts.Constant;
 import com.bill24.bill24onlinepaymentsdk.model.conts.LanguageCode;
 import com.bill24.bill24onlinepaymentsdk.core.RequestAPI;
@@ -43,6 +39,7 @@ import com.bill24.bill24onlinepaymentsdk.model.requestModel.CheckoutDetailReques
 import com.bill24.bill24onlinepaymentsdk.model.baseResponseModel.BaseResponse;
 import com.bill24.bill24onlinepaymentsdk.socketIO.EVentName;
 import com.bill24.bill24onlinepaymentsdk.socketIO.SocketManager;
+import com.bill24.bill24onlinepaymentsdk.socketIO.model.SocketRespModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -121,7 +118,7 @@ public class BottomSheet extends BottomSheetDialogFragment {
         Call<BaseResponse<CheckoutDetailModel>> call=requestAPI.postCheckoutDetail(requestModel);
         call.enqueue(new Callback<BaseResponse<CheckoutDetailModel>>() {
             @Override
-            public void onResponse(Call<BaseResponse<CheckoutDetailModel>> call, Response<BaseResponse<CheckoutDetailModel>> response) {
+            public void onResponse(@NonNull Call<BaseResponse<CheckoutDetailModel>> call, @NonNull Response<BaseResponse<CheckoutDetailModel>> response) {
                 if(response.isSuccessful()){
                     List<BankPaymentMethodModel> bankPaymentMethodModelList=
                                 (   response.body() !=null &&
@@ -178,18 +175,12 @@ public class BottomSheet extends BottomSheetDialogFragment {
                 }
             }
             @Override
-            public void onFailure(Call<BaseResponse<CheckoutDetailModel>> call, Throwable t) {
+            public void onFailure(@NonNull Call<BaseResponse<CheckoutDetailModel>> call, @NonNull Throwable t) {
 
                 Toast.makeText(getContext(),"Error internal server",Toast.LENGTH_LONG).show();
 
                 Handler handler=new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog.dismiss();
-                    }
-
-                },4000);
+                handler.postDelayed(() -> dialog.dismiss(),4000);
 
             }
         });
@@ -228,11 +219,29 @@ public class BottomSheet extends BottomSheetDialogFragment {
             @Override
             public void call(Object... args) {
                 Log.d("cccccccc", "call: BroadCast From SerVer"+args);
-
+               String object=args[0].toString();
+               SocketRespModel socketRespModel=SharePreferenceCustom.converJsonToObject(object,SocketRespModel.class);
                 try {
-                    //todo handle launch screen
-                    Intent intent=new Intent(getActivity(), activityClass);
-                    startActivity(intent);
+                    RequestAPI requestAPI=new RequestAPI(refererKey);
+                    CheckoutDetailRequestModel request=new CheckoutDetailRequestModel(socketRespModel.getTranNo());
+                    Call<BaseResponse<CheckoutDetailModel>> call=requestAPI.postCheckoutDetail(request);
+                    call.enqueue(new Callback<BaseResponse<CheckoutDetailModel>>() {
+                        @Override
+                        public void onResponse(Call<BaseResponse<CheckoutDetailModel>> call, Response<BaseResponse<CheckoutDetailModel>> response) {
+
+                            if(response.isSuccessful()){
+                                Intent intent=new Intent(getActivity(),activityClass);
+                                intent.putExtra("MyData", "Hello from SDK");
+                                startActivity(intent);
+                            }
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<BaseResponse<CheckoutDetailModel>> call, Throwable t) {
+
+                        }
+                    });
 
                 }catch (Exception e){
                     Log.d("TAG", "call: "+e.getMessage());

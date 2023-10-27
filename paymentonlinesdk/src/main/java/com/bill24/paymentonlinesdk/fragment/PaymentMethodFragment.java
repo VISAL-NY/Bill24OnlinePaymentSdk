@@ -6,14 +6,17 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,22 +30,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bill24.bill24onlinepaymentsdk.R;
 import com.bill24.paymentonlinesdk.adapter.PaymentMethodAdapter;
 import com.bill24.paymentonlinesdk.bottomsheetDialogFragment.BottomSheet;
+import com.bill24.paymentonlinesdk.core.RequestAPI;
 import com.bill24.paymentonlinesdk.helper.ChangLanguage;
 import com.bill24.paymentonlinesdk.helper.ConnectivityState;
+import com.bill24.paymentonlinesdk.helper.ConvertColorHexa;
 import com.bill24.paymentonlinesdk.helper.SetFont;
 import com.bill24.paymentonlinesdk.helper.SharePreferenceCustom;
 import com.bill24.paymentonlinesdk.helper.StickyHeaderItemDecoration;
 import com.bill24.paymentonlinesdk.model.BankPaymentMethodItemModel;
 import com.bill24.paymentonlinesdk.model.BankPaymentMethodModel;
+import com.bill24.paymentonlinesdk.model.CheckoutPageConfigModel;
 import com.bill24.paymentonlinesdk.model.ExpiredTransactionModel;
 import com.bill24.paymentonlinesdk.model.GenerateLinkDeepLinkModel;
 import com.bill24.paymentonlinesdk.model.TransactionInfoModel;
+import com.bill24.paymentonlinesdk.model.appearance.darkMode.DarkModeModel;
+import com.bill24.paymentonlinesdk.model.appearance.lightMode.LightModeModel;
 import com.bill24.paymentonlinesdk.model.baseResponseModel.BaseResponse;
 import com.bill24.paymentonlinesdk.model.conts.Bank;
 import com.bill24.paymentonlinesdk.model.conts.Constant;
-import com.bill24.paymentonlinesdk.model.core.RequestAPI;
 import com.bill24.paymentonlinesdk.model.requestModel.ExpiredRequestModel;
 import com.bill24.paymentonlinesdk.model.requestModel.GenerateDeeplinkRequestModel;
+import com.google.android.material.divider.MaterialDivider;
 
 import java.util.List;
 
@@ -57,15 +65,18 @@ public class PaymentMethodFragment extends Fragment
     private RecyclerView recyclerViewPaymentMethod;
     private AppCompatTextView textVersion,
             textTotalAmount,textCurrency,textPaymentMethod,
-            textTotalAmountTitle;
+            textTotalAmountTitle,texBill24,textPowerby;
+    private MaterialDivider verticalDivider;
     private LinearLayoutCompat containerPaymentMethod;
+    private FrameLayout bottomPaymentContainer,bottomDashLine;
     private List<BankPaymentMethodModel> bankPaymentMethodModelList;
     private TransactionInfoModel transactionInfoModel;
+    private CheckoutPageConfigModel checkoutPageConfigModel;
     private String refererKey,language;
+    private boolean isLightMode;
     public PaymentMethodFragment(){
     }
-
-
+    
     private void initView(View view){
         textPaymentMethod=view.findViewById(R.id.text_payment_method);
         recyclerViewPaymentMethod=view.findViewById(R.id.recycler_payment_method);
@@ -74,11 +85,29 @@ public class PaymentMethodFragment extends Fragment
         textCurrency=view.findViewById(R.id.text_total_amount_currency);
         textTotalAmount =view.findViewById(R.id.text_total_amount);
         containerPaymentMethod=view.findViewById(R.id.container_payment_method);
+        texBill24=view.findViewById(R.id.bill24);
+        textPowerby=view.findViewById(R.id.text_power_by);
+        verticalDivider=view.findViewById(R.id.vertical_divider);
+        bottomPaymentContainer=view.findViewById(R.id.bottom_payment_method_container);
+        bottomDashLine=view.findViewById(R.id.bottom_dash_line_container);
     }
 
     private void bindView(){
         textTotalAmount.setText(transactionInfoModel.getTranAmountDisplay());
         textCurrency.setText(transactionInfoModel.getCurrency());
+    }
+
+    private void toggleBill24(){
+        if(checkoutPageConfigModel.isDisplayBill24Info()){
+            texBill24.setVisibility(View.VISIBLE);
+            textPowerby.setVisibility(View.VISIBLE);
+            verticalDivider.setVisibility(View.VISIBLE);
+
+        }else {
+            texBill24.setVisibility(View.GONE);
+            textPowerby.setVisibility(View.GONE);
+            verticalDivider.setVisibility(View.GONE);
+        }
     }
 
     private void updateFont(){
@@ -91,43 +120,24 @@ public class PaymentMethodFragment extends Fragment
         textPaymentMethod.setTextColor(getResources().getColor(R.color.header_font_color));
 
         textTotalAmountTitle.setTypeface(typeface);
-        textTotalAmountTitle.setTextSize(10);
+        textTotalAmountTitle.setTextSize(11);
 
     }
 
     private void setupRecyclerView(PaymentMethodAdapter.PaymentMethodClickListener listener){
-//        List<BankPaymentMethodItemModel> bankPaymentMethodItemModels=new ArrayList<>();
-//        bankPaymentMethodItemModels.add(new BankPaymentMethodItemModel("MASTERCARD","Credit or Debit Card"));
-//
-//        List<BankPaymentMethodItemModel> bankPaymentMethodItemModels1=new ArrayList<>();
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//        bankPaymentMethodItemModels1.add(new BankPaymentMethodItemModel("AMK","AMK"));
-//
-//
-//
-//        List<BankPaymentMethodModel> bankPaymentMethodModelList1=new ArrayList<>();
-//        bankPaymentMethodModelList1.add(new BankPaymentMethodModel("KHQR or Credit/Debit Card",bankPaymentMethodItemModels));
-//        bankPaymentMethodModelList1.add(new BankPaymentMethodModel("Bank Payment",bankPaymentMethodItemModels1));
-
-
 
         if(bankPaymentMethodModelList !=null && !bankPaymentMethodModelList.isEmpty()){
             PaymentMethodAdapter adapter=new PaymentMethodAdapter();
-            adapter.setPaymentMethod(transactionInfoModel,bankPaymentMethodModelList,transactionInfoModel.getTranId(),refererKey,language);
+
+            adapter.setPaymentMethod(
+                    checkoutPageConfigModel,
+                    transactionInfoModel,
+                    bankPaymentMethodModelList,
+                    transactionInfoModel.getTranNo(),
+                    refererKey,
+                    isLightMode,
+                    language);
+
             adapter.setOnItemClickListener(listener);
             recyclerViewPaymentMethod.setLayoutManager(new LinearLayoutManager(getContext()));
             recyclerViewPaymentMethod.setAdapter(adapter);
@@ -167,6 +177,10 @@ public class PaymentMethodFragment extends Fragment
     private void launchDeeplink(String url){
         Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(url));
         startActivity(intent);
+
+
+
+
     }
 
     private void getPreference(){
@@ -175,12 +189,119 @@ public class PaymentMethodFragment extends Fragment
         bankPaymentMethodModelList= SharePreferenceCustom.convertFromJsonToListObject(bankPaymentMethodJson, BankPaymentMethodModel.class);
         String transactionInfoJson=preferences.getString(Constant.KEY_TRANSACTION_INFO,"");
         transactionInfoModel= SharePreferenceCustom.converJsonToObject(transactionInfoJson, TransactionInfoModel.class);
+        String checkoutPageConfigJson=preferences.getString(Constant.KEY_CHECKOUT_PAGE_CONFIG,"");
+        checkoutPageConfigModel= SharePreferenceCustom.converJsonToObject(checkoutPageConfigJson, CheckoutPageConfigModel.class);
 
         //get language
         language=preferences.getString(Constant.KEY_LANGUAGE_CODE,"");
         //get refererKey
         refererKey=preferences.getString(Constant.KEY_REFERER_KEY,"");
+
+        //get isLightMode
+        isLightMode=preferences.getBoolean(Constant.IS_LIGHT_MODE,true);
     }
+
+
+    private void applyStyleLightMode(){
+        LightModeModel lightModeModel=checkoutPageConfigModel.getAppearance().getLightMode();
+
+        //text header
+        String headerColor=lightModeModel.getPrimaryColor().getTextColor();
+        String convertHeaderColor= ConvertColorHexa.convertHex(headerColor);
+        textPaymentMethod.setTextColor(Color.parseColor(convertHeaderColor));
+
+        //recyclerView bg
+        String bgRecylcerView=lightModeModel.getSecondaryColor().getBackgroundColor();
+        String bgRecyclerViewHexa= ConvertColorHexa.convertHex(bgRecylcerView);
+        recyclerViewPaymentMethod.setBackgroundColor(Color.parseColor(bgRecyclerViewHexa));
+
+        //bottom Container
+        bottomPaymentContainer.setBackgroundColor(Color.parseColor(bgRecyclerViewHexa));
+
+        // total amount text power_by bill24 version
+        String totalAmountTitleColor=lightModeModel.getSecondaryColor().getTextColor();
+        String totalAmountTitleHexa= ConvertColorHexa.convertHex(totalAmountTitleColor);
+        textTotalAmountTitle.setTextColor(Color.parseColor(totalAmountTitleHexa));
+        textPowerby.setTextColor(Color.parseColor(totalAmountTitleHexa));
+        texBill24.setTextColor(Color.parseColor(totalAmountTitleHexa));
+        verticalDivider.setDividerColor(Color.parseColor(totalAmountTitleHexa));
+        textVersion.setTextColor(Color.parseColor(totalAmountTitleHexa));
+
+        //total amount currency
+        String totalAmountColor=lightModeModel.getPrimaryColor().getTextColor();
+        String totalAmountHexa= ConvertColorHexa.convertHex(totalAmountColor);
+        textTotalAmount.setTextColor(Color.parseColor(totalAmountHexa));
+        textCurrency.setTextColor(Color.parseColor(totalAmountHexa));
+
+
+        //dash line
+        String dashLineColor=lightModeModel.getSecondaryColor().getTextColor();
+        String dashLineColorHexa= ConvertColorHexa.convertHex(dashLineColor);
+
+        GradientDrawable gradientDrawable = new GradientDrawable();
+        gradientDrawable.setShape(GradientDrawable.RECTANGLE);
+        gradientDrawable.setStroke(1,
+                Color.parseColor(dashLineColorHexa),
+                15,
+                15); // Set the stroke color and width
+        gradientDrawable.setCornerRadius(40); // Set the corner radius
+        gradientDrawable.setDither(true);
+        bottomDashLine.setBackground(gradientDrawable);
+
+
+
+
+    }
+    private void applyStyleDarkMode(){
+        DarkModeModel darkModeModel=checkoutPageConfigModel.getAppearance().getDarkMode();
+
+        //text header
+        String headerColor=darkModeModel.getPrimaryColor().getTextColor();
+        String convertHeaderColor= ConvertColorHexa.convertHex(headerColor);
+        textPaymentMethod.setTextColor(Color.parseColor(convertHeaderColor));
+
+        //recyclerView bg
+        String bgRecylcerView=darkModeModel.getSecondaryColor().getBackgroundColor();
+        String bgRecyclerViewHexa= ConvertColorHexa.convertHex(bgRecylcerView);
+        recyclerViewPaymentMethod.setBackgroundColor(Color.parseColor(bgRecyclerViewHexa));
+
+        //bottom Container
+        bottomPaymentContainer.setBackgroundColor(Color.parseColor(bgRecyclerViewHexa));
+
+        // total amount text power_by bill24 version
+        String totalAmountTitleColor=darkModeModel.getSecondaryColor().getTextColor();
+        String totalAmountTitleHexa= ConvertColorHexa.convertHex(totalAmountTitleColor);
+        textTotalAmountTitle.setTextColor(Color.parseColor(totalAmountTitleHexa));
+        textPowerby.setTextColor(Color.parseColor(totalAmountTitleHexa));
+        texBill24.setTextColor(Color.parseColor(totalAmountTitleHexa));
+        verticalDivider.setDividerColor(Color.parseColor(totalAmountTitleHexa));
+        textVersion.setTextColor(Color.parseColor(totalAmountTitleHexa));
+
+        //total amount currency
+        String totalAmountColor=darkModeModel.getPrimaryColor().getTextColor();
+        String totalAmountHexa= ConvertColorHexa.convertHex(totalAmountColor);
+        textTotalAmount.setTextColor(Color.parseColor(totalAmountHexa));
+        textCurrency.setTextColor(Color.parseColor(totalAmountHexa));
+
+
+        //dash line
+        GradientDrawable gradientDrawable = new GradientDrawable();
+        gradientDrawable.setShape(GradientDrawable.RECTANGLE);
+        gradientDrawable.setStroke(1,
+                Color.parseColor(totalAmountTitleHexa),
+                15,
+                15); // Set the stroke color and width
+        gradientDrawable.setCornerRadius(40); // Set the corner radius
+        gradientDrawable.setDither(true);
+        bottomDashLine.setBackground(gradientDrawable);
+
+
+
+
+    }
+
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -190,6 +311,8 @@ public class PaymentMethodFragment extends Fragment
         getPreference();
         ChangLanguage.setLanguage(language,getContext());
 
+
+
     }
 
     @Nullable
@@ -198,12 +321,22 @@ public class PaymentMethodFragment extends Fragment
         View view=inflater.inflate(R.layout.payment_method_fragment_layout,container,false);
         initView(view);
 
+        //initStyle
+        if (isLightMode){
+            applyStyleLightMode();
+        }else {
+            applyStyleDarkMode();
+        }
+
+
         //set container of webview height to 90%
         int screenHeight=getResources().getDisplayMetrics().heightPixels;
         int newHeight=(int) (screenHeight*0.9);
         LinearLayoutCompat.LayoutParams layoutParams=new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,newHeight);
         containerPaymentMethod.setLayoutParams(layoutParams);
 
+        //show hide bill24
+        toggleBill24();
 
         //Update Font
         updateFont();
@@ -241,7 +374,7 @@ public class PaymentMethodFragment extends Fragment
                 postExpiredTran(expiredRequestModel);
                 Fragment fragment=getParentFragment();
                 if(fragment !=null && fragment instanceof BottomSheet){
-                    ((BottomSheet)getParentFragment()).showFragment(new KhqrFragment(transactionInfoModel.getTranId()));
+                    ((BottomSheet)getParentFragment()).showFragment(new KhqrFragment(transactionInfoModel.getTranNo()));
                 }
                 break;
             case Bank.MASTERCARD:
@@ -250,7 +383,7 @@ public class PaymentMethodFragment extends Fragment
                 break;
             default:
                 postExpiredTran(expiredRequestModel);
-                GenerateDeeplinkRequestModel generateDeeplinkRequestModel=new GenerateDeeplinkRequestModel(itemModel.getId(),"2DCDFE54ED2F");
+                GenerateDeeplinkRequestModel generateDeeplinkRequestModel=new GenerateDeeplinkRequestModel(itemModel.getId(), transactionInfoModel.getTranNo());
 
                 RequestAPI requestAPI=new RequestAPI(refererKey);
                 Call<BaseResponse<GenerateLinkDeepLinkModel>> call=requestAPI.postGenerateDeeplink(generateDeeplinkRequestModel);
@@ -262,12 +395,16 @@ public class PaymentMethodFragment extends Fragment
                             BaseResponse<GenerateLinkDeepLinkModel> deeplink=response.body();
                             if(deeplink !=null){
                                 generateLinkDeepLinkModel=deeplink.getData();
-                                //if(itemModel.isSupportDeeplink()){
-                                    launchDeeplink(generateLinkDeepLinkModel.getMobileDeepLink());
-                                  //  return;
-                                //}
+                                if(itemModel.isSupportDeeplink()){
+                                    if(!generateLinkDeepLinkModel.getMobileDeepLink().isEmpty()){
+                                        launchDeeplink(generateLinkDeepLinkModel.getMobileDeepLink());
+                                        return;
+                                    }
+                                }
                                 if(itemModel.isSupportCheckoutPage()){
-                                    ((BottomSheet)getParentFragment()).showFragment(new WebViewCheckoutFragment(generateLinkDeepLinkModel.getWebPaymentLink()));
+                                    if(!generateLinkDeepLinkModel.getWebPaymentLink().isEmpty()){
+                                        ((BottomSheet)getParentFragment()).showFragment(new WebViewCheckoutFragment(generateLinkDeepLinkModel.getWebPaymentLink()));
+                                    }
                                 }
                             }
                         }

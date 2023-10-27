@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container_loading_time"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="end"
     android:layout_marginVertical="@dimen/dimen_size12_5"
-    android:layout_marginEnd="@dimen/dimen_size12_5"
-    tools:ignore="MissingDefaultResource">
+    android:layout_marginEnd="@dimen/dimen_size12_5">
 
-   <com.wang.avi.AVLoadingIndicatorView
-       android:id="@+id/image_loading"
-       android:layout_width="@dimen/dimen_size20"
-       android:layout_height="@dimen/dimen_size20"
-       app:indicatorName="LineSpinFadeLoaderIndicator"
-       android:layout_marginEnd="@dimen/dimen_size7_25"
-       app:indicatorColor="@color/loading_indicator_color"/>
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/image_loading"
+        android:layout_width="17dp"
+        android:layout_height="17dp"
+        android:src="@drawable/loading"
+        android:layout_marginEnd="7.25dp"/>
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text_timer"
         android:layout_width="wrap_content"

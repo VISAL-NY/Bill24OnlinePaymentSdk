@@ -1,12 +1,20 @@
 package com.bill24.paymentonlinesdk.fragment;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.MediaStore;
@@ -14,26 +22,34 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.bill24.bill24onlinepaymentsdk.R;
 import com.bill24.paymentonlinesdk.bottomsheetDialogFragment.BottomSheet;
+import com.bill24.paymentonlinesdk.core.RequestAPI;
+import com.bill24.paymentonlinesdk.customShapeDrawable.CustomShape;
+import com.bill24.paymentonlinesdk.customShapeDrawable.SelectedState;
 import com.bill24.paymentonlinesdk.helper.ChangLanguage;
+import com.bill24.paymentonlinesdk.helper.ConvertColorHexa;
 import com.bill24.paymentonlinesdk.helper.SetFont;
 import com.bill24.paymentonlinesdk.helper.SharePreferenceCustom;
+import com.bill24.paymentonlinesdk.model.CheckoutPageConfigModel;
 import com.bill24.paymentonlinesdk.model.ExpiredTransactionModel;
 import com.bill24.paymentonlinesdk.model.TransactionInfoModel;
+import com.bill24.paymentonlinesdk.model.appearance.darkMode.DarkModeModel;
+import com.bill24.paymentonlinesdk.model.appearance.lightMode.LightModeModel;
 import com.bill24.paymentonlinesdk.model.baseResponseModel.BaseResponse;
 import com.bill24.paymentonlinesdk.model.conts.Constant;
 import com.bill24.paymentonlinesdk.model.conts.CurrencyCode;
-import com.bill24.paymentonlinesdk.model.core.RequestAPI;
 import com.bill24.paymentonlinesdk.model.requestModel.ExpiredRequestModel;
 import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
@@ -54,10 +70,17 @@ public class KhqrFragment extends Fragment {
     private AppCompatTextView textCustomerName,
             textAmount,textCurrency,textCountDownTime,
             textScanToPay,textDownload,textShare,textOr;
-    private AppCompatImageView khqrImage,khqrCurrencyIcon;
-    private FrameLayout downloadContainer,shareContainer,khqrLoading;
+    private AppCompatImageView khqrImage,khqrCurrencyIcon,imageDownload,imageShare;
+    private FrameLayout downloadContainer,shareContainer,khqrLoading,
+            khqrCardContainer,containerQrCode;
+    private RelativeLayout containerLoadingTime;
     private TransactionInfoModel transactionInfoModel;
+    private CheckoutPageConfigModel checkoutPageConfigModel;
+    private AppCompatImageView dashLineLeft,dashLineRight;
     private String transactionId,refererKey,language;
+    private CoordinatorLayout khqrContainer;
+    private View khqrBackground;
+    private  boolean isLightMode;
     public KhqrFragment(String transactionId){
         this.transactionId=transactionId;
     }
@@ -76,6 +99,15 @@ public class KhqrFragment extends Fragment {
         downloadContainer=view.findViewById(R.id.download_container);
         shareContainer=view.findViewById(R.id.share_container);
         khqrLoading=view.findViewById(R.id.khqr_loading);
+        containerLoadingTime=view.findViewById(R.id.container_loading_time);
+        khqrContainer=view.findViewById(R.id.container_khqrfragment);
+        imageDownload=view.findViewById(R.id.image_download);
+        imageShare=view.findViewById(R.id.image_share);
+        dashLineLeft=view.findViewById(R.id.or_dash_line_left);
+        dashLineRight=view.findViewById(R.id.or_dash_line_right);
+        khqrCardContainer=view.findViewById(R.id.khqr_container);
+        khqrBackground=view.findViewById(R.id.khqr_background_color);
+        containerQrCode=view.findViewById(R.id.container_qr_code);
 
     }
 
@@ -103,7 +135,6 @@ public class KhqrFragment extends Fragment {
         }else if(transactionInfoModel.getCurrency().equals(CurrencyCode.KHR)){
             khqrCurrencyIcon.setImageResource(R.drawable.khr_khqr_logo);
         }
-
     }
     private void countTime(long timeMillisecond){
         CountDownTimer countDownTimer=new CountDownTimer(timeMillisecond,1000){
@@ -135,6 +166,14 @@ public class KhqrFragment extends Fragment {
             language=preferences.getString(Constant.KEY_LANGUAGE_CODE,"");
             //get refererKey
             refererKey=preferences.getString(Constant.KEY_REFERER_KEY,"");
+
+            //checkout page config
+            String checkoutPageConfigJson=preferences.getString(Constant.KEY_CHECKOUT_PAGE_CONFIG,"");
+            checkoutPageConfigModel= SharePreferenceCustom.converJsonToObject(checkoutPageConfigJson, CheckoutPageConfigModel.class);
+
+            //get isLight mode
+            isLightMode=preferences.getBoolean(Constant.IS_LIGHT_MODE,true);
+
         }
 
     }
@@ -152,13 +191,20 @@ public class KhqrFragment extends Fragment {
                 if(response.isSuccessful()){
                     khqrLoading.setVisibility(View.GONE);
                     BaseResponse<ExpiredTransactionModel> expiredTran=response.body();
-                   // String expiredTime=expiredTran.getData().getExpiredDate();
-                    String expiredTime="24-10-2023 23:55:34";//todo handle time from api
-                    SimpleDateFormat dateFormat=new SimpleDateFormat("dd-MM-yyyy HH:mm:ss",Locale.US);
+                    String expiredTime=expiredTran.getData().getExpiredDate();
+                    //String expiredTime="2023-10-26 15:54:20";
                     try {
+                        @SuppressLint("SimpleDateFormat")
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         Date expiredDate=dateFormat.parse(expiredTime);
                         Date currentDate=new Date();
                         long timeDifferenceMillisecond=expiredDate.getTime() - currentDate.getTime();
+
+                        if(timeDifferenceMillisecond > 1800000){//30 minutes
+                            containerLoadingTime.setVisibility(View.INVISIBLE);
+                        }else {
+                            containerLoadingTime.setVisibility(View.VISIBLE);
+                        }
 
                         countTime(timeDifferenceMillisecond);
 
@@ -212,8 +258,13 @@ public class KhqrFragment extends Fragment {
         snackbarLayout.setBackgroundColor(Color.TRANSPARENT);//remove snackbar background
         snackbarLayout.addView(customView, 0);
 
+        //update font family
+            SetFont font=new SetFont();
+            Typeface typeface=font.setFont(getContext(),language);
+
         // Customize the content and appearance of the custom layout
             AppCompatTextView textView = customView.findViewById(R.id.custom_snackbar_desc);
+            textView.setTypeface(typeface);
             textView.setText(desc);
 
             AppCompatImageView imageView=customView.findViewById(R.id.custom_snackbar_icon);
@@ -233,9 +284,9 @@ public class KhqrFragment extends Fragment {
         String imageUrl= MediaStore.Images.Media.insertImage(requireActivity().getContentResolver(),bitmap,imageTitle,"");
 
         if(imageUrl!=null){
-            customSnackBar(view,R.drawable.check_24,"Image saved !");
+            customSnackBar(view,R.drawable.check_circle_24px,getResources().getString(R.string.image_saved));
         }else {
-            customSnackBar(view,R.drawable.close_24,"Failed to save image !");
+            customSnackBar(view,R.drawable.error_24px,getResources().getString(R.string.image_unsave));
         }
     }
     private void shareKHQR(Bitmap bitmap){
@@ -258,11 +309,167 @@ public class KhqrFragment extends Fragment {
             throw new RuntimeException(e);
         }
     }
+
+
+    private void applyStyleShapeLightMode(){
+
+        LightModeModel lightModeModel= checkoutPageConfigModel.getAppearance().getLightMode();
+
+
+    //khqr container
+       String bgKhqrContainerColor=lightModeModel.getSecondaryColor().getBackgroundColor();
+       String bgKhqrContainerHexa= ConvertColorHexa.convertHex(bgKhqrContainerColor);
+       khqrContainer.setBackgroundColor(Color.parseColor(bgKhqrContainerHexa));
+
+       //text scan text or
+        String scanPayColor=lightModeModel.getPrimaryColor().getTextColor();
+        String scanPayColorHexa= ConvertColorHexa.convertHex(scanPayColor);
+        textScanToPay.setTextColor(Color.parseColor(scanPayColorHexa));
+        textOr.setTextColor(Color.parseColor(scanPayColorHexa));
+
+        // dash line
+        String dashLine=lightModeModel.getSecondaryColor().getTextColor();
+        String dashLineHexa= ConvertColorHexa.convertHex(dashLine);
+        GradientDrawable gradientDrawable = new GradientDrawable();
+        gradientDrawable.setShape(GradientDrawable.LINE);
+        gradientDrawable.setStroke(1,
+                Color.parseColor(dashLineHexa),
+                15.0f,
+                15.0f); // Set the stroke color and width
+        gradientDrawable.setCornerRadius(20); // Set the corner radius
+        gradientDrawable.setDither(true);
+
+        dashLineLeft.setBackground(gradientDrawable);
+        dashLineRight.setBackground(gradientDrawable);
+
+
+        //count time
+        String countTimeColor=lightModeModel.getSecondaryColor().getTextColor();
+        String countTimeColorHexa= ConvertColorHexa.convertHex(countTimeColor);
+        textCountDownTime.setTextColor(Color.parseColor(countTimeColorHexa));
+
+
+
+
+       //apply shape
+       String bgDownloadShare=lightModeModel.getButton().getActionButton().getBackgroundColor();
+       String bgDownloadShareHexa= ConvertColorHexa.convertHex(bgDownloadShare);
+
+        ShapeDrawable shape= CustomShape.applyShape(Color.parseColor(bgDownloadShareHexa),20);
+        String downloadShareSelectedColor= ConvertColorHexa.getFiftyPercentColor(bgDownloadShare);
+        ShapeDrawable shape1= CustomShape.applyShape(Color.parseColor(downloadShareSelectedColor),20);
+
+
+        StateListDrawable selectorDownload= SelectedState.selectedSate(shape,shape1);
+        downloadContainer.setBackground(selectorDownload);
+
+        StateListDrawable selectorShare= SelectedState.selectedSate(shape,shape1);
+
+
+        shareContainer.setBackground(selectorShare);
+
+       //apply icon color
+        String iconColor=lightModeModel.getButton().getActionButton().getTextColor();
+        String iconColorHexa= ConvertColorHexa.convertHex(iconColor);
+        ColorFilter colorFilterFavicon=new PorterDuffColorFilter(Color.parseColor(iconColorHexa), PorterDuff.Mode.SRC_ATOP);
+        imageShare.setColorFilter(colorFilterFavicon);
+        imageDownload.setColorFilter(colorFilterFavicon);
+
+        //download share
+        String downloadShareColor=lightModeModel.getSecondaryColor().getTextColor();
+        String downloadShareHexa= ConvertColorHexa.convertHex(downloadShareColor);
+
+        textDownload.setTextColor(Color.parseColor(downloadShareHexa));
+        textShare.setTextColor(Color.parseColor(downloadShareHexa));
+
+
+
+
+
+    }
+
+
+    private void applyStyleShapeDarkMode(){
+
+        DarkModeModel darkModeModel= checkoutPageConfigModel.getAppearance().getDarkMode();
+
+
+        //khqr container
+        String bgKhqrContainerColor=darkModeModel.getSecondaryColor().getBackgroundColor();
+        String bgKhqrContainerHexa= ConvertColorHexa.convertHex(bgKhqrContainerColor);
+        khqrContainer.setBackgroundColor(Color.parseColor(bgKhqrContainerHexa));
+
+        //text scan text or
+        String scanPayColor=darkModeModel.getPrimaryColor().getTextColor();
+        String scanPayColorHexa= ConvertColorHexa.convertHex(scanPayColor);
+        textScanToPay.setTextColor(Color.parseColor(scanPayColorHexa));
+        textOr.setTextColor(Color.parseColor(scanPayColorHexa));
+
+        // dash line
+        String dashLine=darkModeModel.getSecondaryColor().getTextColor();
+        String dashLineHexa= ConvertColorHexa.convertHex(dashLine);
+        GradientDrawable gradientDrawable = new GradientDrawable();
+        gradientDrawable.setShape(GradientDrawable.LINE);
+        gradientDrawable.setStroke(1,
+                Color.parseColor(dashLineHexa),
+                15.0f,
+                15.0f); // Set the stroke color and width// Set the corner radius
+        gradientDrawable.setDither(true);
+
+        dashLineLeft.setBackground(gradientDrawable);
+        dashLineRight.setBackground(gradientDrawable);
+
+
+        //count time
+        String countTimeColor=darkModeModel.getSecondaryColor().getTextColor();
+        String countTimeColorHexa= ConvertColorHexa.convertHex(countTimeColor);
+        textCountDownTime.setTextColor(Color.parseColor(countTimeColorHexa));
+
+
+
+
+        //apply shape
+        String bgDownloadShare=darkModeModel.getButton().getActionButton().getBackgroundColor();
+        String bgDownloadShareHexa= ConvertColorHexa.convertHex(bgDownloadShare);
+
+
+        ShapeDrawable shape= CustomShape.applyShape(Color.parseColor(bgDownloadShareHexa),20);
+        String downloadShareSelectedColor= ConvertColorHexa.getFiftyPercentColor(bgDownloadShare);
+        ShapeDrawable shape1= CustomShape.applyShape(Color.parseColor(downloadShareSelectedColor),20);
+
+
+        StateListDrawable selectorDownload= SelectedState.selectedSate(shape,shape1);
+        downloadContainer.setBackground(selectorDownload);
+
+        StateListDrawable selectorShare= SelectedState.selectedSate(shape,shape1);
+
+
+        shareContainer.setBackground(selectorShare);
+
+        //apply icon color
+        String iconColor=darkModeModel.getButton().getActionButton().getTextColor();
+        String iconColorHexa= ConvertColorHexa.convertHex(iconColor);
+        ColorFilter colorFilterFavicon=new PorterDuffColorFilter(Color.parseColor(iconColorHexa), PorterDuff.Mode.SRC_ATOP);
+        imageShare.setColorFilter(colorFilterFavicon);
+        imageDownload.setColorFilter(colorFilterFavicon);
+
+        //download share
+        String downloadShareColor=darkModeModel.getSecondaryColor().getTextColor();
+        String downloadShareHexa= ConvertColorHexa.convertHex(downloadShareColor);
+
+        textDownload.setTextColor(Color.parseColor(downloadShareHexa));
+        textShare.setTextColor(Color.parseColor(downloadShareHexa));
+
+
+
+
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSharePreference();
         ChangLanguage.setLanguage(language,getContext());
+
 
     }
 
@@ -274,6 +481,32 @@ public class KhqrFragment extends Fragment {
         bindData();
         //Update Font
         updateFont();
+
+        //applyStyle
+        if(isLightMode){
+            applyStyleShapeLightMode();
+
+        }else {
+            applyStyleShapeDarkMode();
+        }
+
+        //apply khqr card corner
+        ShapeDrawable khqrCard= CustomShape.applyShape(Color.WHITE,100.0f);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            int shadowColor=Color.argb(90,0,0,0);
+            khqrCardContainer.setOutlineSpotShadowColor(shadowColor);
+        }
+        khqrCardContainer.setElevation(20f);
+        khqrCardContainer.setBackground(khqrCard);
+
+        ShapeDrawable containerQrcode= CustomShape.applyShape(Color.WHITE,100.0f);
+        containerQrCode.setBackground(containerQrcode);
+
+        ShapeDrawable khqrBg= CustomShape.applyShape(
+                getResources().getColor(R.color.khqr_backgound_color),100.0f);
+        khqrBackground.setBackground(khqrBg);
+
+
 
         postExtendExpiredTime();//get expired date from api
 
@@ -297,6 +530,7 @@ public class KhqrFragment extends Fragment {
             shareKHQR(bitmap);
 
         });
+
 
         return view;
     }

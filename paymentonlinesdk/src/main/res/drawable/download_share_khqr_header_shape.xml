@@ -5,5 +5,4 @@
         android:topRightRadius="30dp"
         android:topLeftRadius="@dimen/dimen_size30"/>
     <solid android:color="@color/khqr_backgound_color"/>
-
 </shape>

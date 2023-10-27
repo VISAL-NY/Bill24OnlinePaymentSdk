@@ -8,7 +8,6 @@ import android.net.NetworkInfo;
 
 public class ConnectivityState extends BroadcastReceiver {
 
-
     private ConnectivityListener listener;
     private boolean wasResortConnection=true;
     public ConnectivityState(ConnectivityListener listener){

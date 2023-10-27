@@ -1,5 +1,6 @@
 package com.bill24.paymentonlinesdk.model;
 
+import com.bill24.paymentonlinesdk.model.appearance.AppearanceModel;
 import com.google.gson.annotations.SerializedName;
 
 public class CheckoutPageConfigModel {
@@ -34,6 +35,20 @@ public class CheckoutPageConfigModel {
     public void setFavicon(FaviIconModel favicon) {
         this.favicon = favicon;
     }
+    public Setting getSetting() {
+        return setting;
+    }
+
+    public void setSetting(Setting setting) {
+        this.setting = setting;
+    }
+    public AppearanceModel getAppearance() {
+        return appearance;
+    }
+
+    public void setAppearance(AppearanceModel appearance) {
+        this.appearance = appearance;
+    }
 
     @SerializedName("logo")
     private String logo;
@@ -43,4 +58,8 @@ public class CheckoutPageConfigModel {
     private  boolean displayBill24Info;
     @SerializedName("favicon")
     private FaviIconModel favicon;
+    @SerializedName("setting")
+    private Setting setting;
+    @SerializedName("appearance")
+    private AppearanceModel appearance;
 }

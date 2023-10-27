@@ -109,7 +109,6 @@ public class KhqrFragment extends Fragment {
         khqrBackground=view.findViewById(R.id.khqr_background_color);
         containerQrCode=view.findViewById(R.id.container_qr_code);
 
-
     }
 
     private void updateFont(){
@@ -125,9 +124,6 @@ public class KhqrFragment extends Fragment {
         textOr.setTextSize(11);
     }
 
-
-
-
     private void bindData(){
         textCustomerName.setText(transactionInfoModel.getCustomerName());
         textAmount.setText(transactionInfoModel.getTotalAmountDisplay());
@@ -139,7 +135,6 @@ public class KhqrFragment extends Fragment {
         }else if(transactionInfoModel.getCurrency().equals(CurrencyCode.KHR)){
             khqrCurrencyIcon.setImageResource(R.drawable.khr_khqr_logo);
         }
-
     }
     private void countTime(long timeMillisecond){
         CountDownTimer countDownTimer=new CountDownTimer(timeMillisecond,1000){
@@ -496,7 +491,7 @@ public class KhqrFragment extends Fragment {
         }
 
         //apply khqr card corner
-        ShapeDrawable khqrCard=CustomShape.applyShape(Color.WHITE,80.0f);
+        ShapeDrawable khqrCard=CustomShape.applyShape(Color.WHITE,100.0f);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             int shadowColor=Color.argb(90,0,0,0);
             khqrCardContainer.setOutlineSpotShadowColor(shadowColor);
@@ -504,11 +499,11 @@ public class KhqrFragment extends Fragment {
         khqrCardContainer.setElevation(20f);
         khqrCardContainer.setBackground(khqrCard);
 
-        ShapeDrawable containerQrcode=CustomShape.applyShape(Color.WHITE,80.0f);
+        ShapeDrawable containerQrcode=CustomShape.applyShape(Color.WHITE,100.0f);
         containerQrCode.setBackground(containerQrcode);
 
         ShapeDrawable khqrBg=CustomShape.applyShape(
-                getResources().getColor(R.color.khqr_backgound_color),80.0f);
+                getResources().getColor(R.color.khqr_backgound_color),100.0f);
         khqrBackground.setBackground(khqrBg);
 
 

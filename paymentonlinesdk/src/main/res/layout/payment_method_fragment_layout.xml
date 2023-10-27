@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:orientation="vertical"
+>
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text_payment_method"
         android:layout_marginTop="5dp"
@@ -14,17 +15,19 @@
         android:textColor="@color/header_font_color"
         android:text="@string/payment_way"
         android:layout_marginBottom="15dp"
+
         />
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_payment_method"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingBottom="100dp"
-            android:background="@color/bottom_payment_method_color"
+            android:background="#000000"
             />
 
 <!--    bottom view-->

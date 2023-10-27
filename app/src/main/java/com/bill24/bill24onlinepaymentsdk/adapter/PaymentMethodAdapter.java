@@ -148,7 +148,7 @@ public class PaymentMethodAdapter extends RecyclerView.Adapter<RecyclerView.View
         call.enqueue(new Callback<BaseResponse<AddToFavoriteModel>>() {
             @Override
             public void onResponse(Call<BaseResponse<AddToFavoriteModel>> call, Response<BaseResponse<AddToFavoriteModel>> response) {
-//                response.body();
+               // response.body();
             }
 
             @Override

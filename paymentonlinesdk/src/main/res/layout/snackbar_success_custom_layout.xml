@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/snackbar_success_custom_shape"
+    android:paddingVertical="@dimen/dimen_size10"
+    android:paddingLeft="@dimen/dimen_size30">
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/custom_snackbar_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/check_circle_24px"
+        android:layout_gravity="center"/>
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/custom_snackbar_desc"
+        android:layout_marginStart="@dimen/dimen_size10"
+        android:textColor="@color/snackbar_text_color"
+        android:text="@string/image_saved"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="@font/roboto_regular"
+        android:textSize="14sp"/>
+
+</androidx.appcompat.widget.LinearLayoutCompat>
