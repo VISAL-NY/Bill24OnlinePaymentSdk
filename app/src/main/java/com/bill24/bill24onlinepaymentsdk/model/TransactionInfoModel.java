@@ -222,6 +222,17 @@ public class TransactionInfoModel implements Serializable {
     private String totalAmountDisplay;
     @SerializedName("currency")
     private  String currency;
+
+    public boolean isAllowFavorite() {
+        return isAllowFavorite;
+    }
+
+    public void setAllowFavorite(boolean allowFavorite) {
+        isAllowFavorite = allowFavorite;
+    }
+
+    @SerializedName("is_allow_favorite")
+    private boolean isAllowFavorite;
     @SerializedName("customer_code")
     private  String customerCode;
     @SerializedName("customer_name")

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Bill24OnlinePaymentSdk</string>
+    <string name="power_by">power by</string>
     <string name="payment_way">មធ្យោបាយនៃការទូទាត់</string>
     <string name="expire_title">ប្រតិបត្តិការបានផុតកំណត់</string>
     <string name="try_again_title">សូមព្យាយាមម្តងទៀតដើម្បីបន្តប្រតិបត្តិការ</string>
@@ -11,4 +12,11 @@
     <string name="share">ចែករំលែក</string>
     <string name="total_amount">ចំនួនទឹកប្រាក់</string>
     <string name="fee">សេវា</string>
+    <string name="total_amount_display">237.57</string>
+    <string name="usd">USD</string>
+    <string name="bill24">Bill24</string>
+    <string name="version">V1.0.0.0</string>
+    <string name="khqr">ទូទាត់តាម រយះ KHQR</string>
+    <string name="image_saved">ទាញយករូបភាពជោគជ័យ !</string>
+    <string name="image_unsave">ទាញយករូបភាពមិនជោគជ័យ !</string>
 </resources>

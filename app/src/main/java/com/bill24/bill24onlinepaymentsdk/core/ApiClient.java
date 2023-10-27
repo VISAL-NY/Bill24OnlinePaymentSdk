@@ -1,4 +1,4 @@
-package com.bill24.bill24onlinepaymentsdk.model.core;
+package com.bill24.bill24onlinepaymentsdk.core;
 
 import com.bill24.bill24onlinepaymentsdk.model.AddToFavoriteModel;
 import com.bill24.bill24onlinepaymentsdk.model.CheckoutDetailModel;
@@ -22,7 +22,7 @@ public interface ApiClient {
             @Header("token") String token,
             @Header("Referer-Key") String refererKey,
             @Body CheckoutDetailRequestModel requestModel);
-    @POST("checkout/generatelinks")
+    @POST("checkout/generate_links")
     Call<BaseResponse<GenerateLinkDeepLinkModel>> postGenerateDeepLink(
             @Header("Content-Type") String contentType,
             @Header("token") String token,
@@ -30,14 +30,14 @@ public interface ApiClient {
             @Body GenerateDeeplinkRequestModel requestModel
     );
 
-    @POST("transaction/extend_expire_date")
+    @POST("checkout/extend_expire_date")
     Call<BaseResponse<ExpiredTransactionModel>> postExpiredTransaction(
             @Header("Content-Type") String contentType,
             @Header("token") String token,
             @Header("Referer-Key") String refererKey,
             @Body ExpiredRequestModel requestModel
             );
-    @POST("transaction/favorite")
+    @POST("checkout/favorite_bank")
     Call<BaseResponse<AddToFavoriteModel>> postAddToFavorite(
             @Header("Content-Type") String contentType,
             @Header("token") String token,

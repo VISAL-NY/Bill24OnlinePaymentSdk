@@ -19,9 +19,9 @@ public class GenerateDeeplinkRequestModel {
         this.transactionNo = transactionNo;
     }
 
-    public GenerateDeeplinkRequestModel(String bankId, String transactionId) {
+    public GenerateDeeplinkRequestModel(String bankId, String transactionNo) {
         this.bankId = bankId;
-        this.transactionNo = transactionId;
+        this.transactionNo = transactionNo;
     }
 
     @SerializedName("bank_id")

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginStart="@dimen/customer_name_size"
+    android:layout_marginTop="@dimen/dimen_size12_5"
+    android:layout_marginBottom="@dimen/dimen_size12_5"
+    >
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text_khqr_customer_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="kranh virakbot"
+        android:textSize="8sp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/nunitosans_semi_bold"
+        />
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/text_khqr_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="20.00"
+            android:textSize="17sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/nunitosans_extra_bold"
+            android:layout_marginEnd="@dimen/dimen_size7_25"
+            />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/text_khqr_currency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="USD"
+            android:fontFamily="@font/nunitosans_semi_bold"
+            android:textSize="8sp"
+            android:textColor="@color/black"
+            />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

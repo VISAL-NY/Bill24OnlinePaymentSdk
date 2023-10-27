@@ -1,4 +1,4 @@
-package com.bill24.bill24onlinepaymentsdk.model.core;
+package com.bill24.bill24onlinepaymentsdk.core;
 
 import com.bill24.bill24onlinepaymentsdk.model.AddToFavoriteModel;
 import com.bill24.bill24onlinepaymentsdk.model.CheckoutDetailModel;

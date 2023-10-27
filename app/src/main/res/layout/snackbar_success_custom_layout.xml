@@ -3,24 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="@drawable/snackbar_custom_shape"
+    android:background="@drawable/snackbar_success_custom_shape"
     android:paddingVertical="@dimen/dimen_size10"
     android:paddingLeft="@dimen/dimen_size30">
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/custom_snackbar_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/check_24"
+        android:src="@drawable/check_circle_24px"
         android:layout_gravity="center"/>
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/custom_snackbar_desc"
         android:layout_marginStart="@dimen/dimen_size10"
-        android:textColor="@color/white"
-        android:text="Image Saved !"
+        android:textColor="@color/snackbar_text_color"
+        android:text="@string/image_saved"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:fontFamily="@font/battambang_regular"
-        android:textSize="12sp"/>
+        android:fontFamily="@font/roboto_regular"
+        android:textSize="14sp"/>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

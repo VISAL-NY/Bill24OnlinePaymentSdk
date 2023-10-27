@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="dimen_size12_5">12.5dp</dimen>
+    <dimen name="dimen_size7_25">7.25dp</dimen>
+    <dimen name="dimen_size73">73dp</dimen>
+    <dimen name="dimen_size20">20dp</dimen>
+    <dimen name="dimen_size40">40dp</dimen>
+    <dimen name="dimen_size75">75dp</dimen>
+    <dimen name="dimen_size10">10dp</dimen>
+    <dimen name="dimen_size30">30dp</dimen>
+    <dimen name="khqr_card_width">245dp</dimen>
+    <dimen name="khqr_card_height">358dp</dimen>
+    <dimen name="qrcode_width">195dp</dimen>
+    <dimen name="qrcode_height">195dp</dimen>
+    <dimen name="dimen_size25">25dp</dimen>
+    <dimen name="customer_name_size">30dp</dimen>
+    <dimen name="dimen_size50">50dp</dimen>
+    <dimen name="payment_card_horizontal">15dp</dimen>
+    <dimen name="section_header_height">35dp</dimen>
+    <dimen name="section_header_margin_bottom">15dp</dimen>
+</resources>

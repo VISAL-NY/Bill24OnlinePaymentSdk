@@ -1,8 +1,6 @@
-package com.bill24.bill24onlinepaymentsdk.model.core;
+package com.bill24.bill24onlinepaymentsdk.core;
 
 import com.bill24.bill24onlinepaymentsdk.model.baseUrl.BaseUrl;
-import com.bill24.bill24onlinepaymentsdk.model.conts.Constant;
-
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;

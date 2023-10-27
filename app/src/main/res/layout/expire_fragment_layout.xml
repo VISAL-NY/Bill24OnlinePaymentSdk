@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/expire_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:layout_marginBottom="18dp"
     >
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/image_warning"
@@ -12,7 +12,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dimen_size20"
         android:src="@drawable/warning_icon"
-
         />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -24,6 +23,7 @@
         android:textColor="@color/black"
         />
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/expire_dash_line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/dash_line_horizontal"
@@ -38,16 +38,26 @@
         android:textColor="@color/black"
         />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <FrameLayout
         android:id="@+id/button_try_again"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:text="@string/try_again"
-        android:background="@drawable/button_click_state"
-        android:textColor="@color/white"
+        android:background="#D52C2C"
         android:layout_marginHorizontal="@dimen/dimen_size20"
         android:layout_marginTop="@dimen/dimen_size30"
-        />
+        android:layout_marginBottom="18dp"
+        >
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/text_button_try_again"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/try_again"
+            android:layout_gravity="center"
+            />
 
+
+
+    </FrameLayout>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

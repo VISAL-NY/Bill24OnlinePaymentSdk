@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Bill24OnlinePaymentSdk</string>
+    <string name="payment_way">Payment method</string>
+    <string name="expire_title">Transaction expired</string>
+    <string name="try_again_title">Please try again</string>
+    <string name="try_again">Try again</string>
+    <string name="scan_to_pay">Scan to pay</string>
+    <string name="or">Or</string>
+    <string name="download">Download</string>
+    <string name="share">Share</string>
+    <string name="total_amount">Total Amount</string>
+    <string name="fee">Fee</string>
+</resources>
