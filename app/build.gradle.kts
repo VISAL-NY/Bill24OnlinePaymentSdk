@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.bill24.bill24onlinepaymentsdk"
-        minSdk = 22
+        minSdk = 24
         targetSdk = 33
         versionCode = 1
         versionName = "1.0.0"
