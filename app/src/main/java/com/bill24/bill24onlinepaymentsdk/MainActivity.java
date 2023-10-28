@@ -13,7 +13,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 
-import com.bill24.bill24onlinepaymentsdk.model.main.Bill24OnlinePayment;
+import com.bill24.onlinepaymentsdk.model.main.Bill24OnlinePayment;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -68,9 +68,11 @@ public class MainActivity extends AppCompatActivity {
             String transactionId1="38E8322D6F4A";
 
 
-            com.bill24.bill24onlinepaymentsdk.model.main.Bill24OnlinePayment bill24OnlinePayment=new Bill24OnlinePayment();
-            com.bill24.bill24onlinepaymentsdk.model.main.Bill24OnlinePayment.showBottomSheet(getSupportFragmentManager(),
-                    transactionId, "123",true,SuccessActivity.class,"");
+//            com.bill24.bill24onlinepaymentsdk.model.main.Bill24OnlinePayment bill24OnlinePayment=new Bill24OnlinePayment();
+    Bill24OnlinePayment.init(getSupportFragmentManager(),
+                    transactionId, "123",false,SuccessActivity.class,"");
+
+
 
            // Bill24OnlinePayment bill24OnlinePayment=new Bill24OnlinePayment();
            // bill24OnlinePayment.showBottomSheet(getSupportFragmentManager(),transactionId,"123","en");

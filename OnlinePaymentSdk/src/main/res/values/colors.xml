@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="foreground_fav_icon">#FF57BC1E</color>
+    <color name="background_fav_icon">#FFEAF7E3</color>
+    <color name="header_font_color">#FF375C94</color>
+    <color name="header_background_color">#FFF7F7F7</color>
+    <color name="khqr_backgound_color">#FFE21A1A</color>
+    <color name="container_bar_color">#FFE0E0E0</color>
+    <color name="transparent">#00000000</color>
+    <color name="bottom_payment_method_color">#FFFBFBFB</color>
+    <color name="try_again_button_color">#FF528A36</color>
+    <color name="douwnload_share_color">#FFD4E8FF</color>
+    <color name="loading_indicator_color">#FFA9ADFD</color>
+    <color name="payment_method_backgound">#FBFBFB</color>
+    <color name="barrier_color">#E11212</color>
+    <color name="dash_line_color">#D6D6D6</color>
+    <color name="button_unclick">#8057BC1E</color>
+    <color name="unfavorite_back_color">#80EAF7E3</color>
+    <color name="undownload_back_color">#80D4E8FF</color>
+    <color name="snackbar_background_color">#EBFCF6</color>
+    <color name="snackbar_text_color">#131C18</color>
+    <color name="new_color">#FF336699</color>
+</resources>

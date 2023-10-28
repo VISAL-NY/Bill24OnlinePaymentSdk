@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Bill24OnlinePaymentSdk"
 include(":app")
+include(":OnlinePaymentSdk")

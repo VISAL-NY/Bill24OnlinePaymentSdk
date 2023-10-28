@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:layout_width="@dimen/khqr_card_width"-->
+<!--    android:layout_height="@dimen/khqr_card_height"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    android:layout_gravity="center"-->
+<!--    app:cardElevation="4dp"-->
+<!--    app:cardCornerRadius="@dimen/dimen_size30">-->
+
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/khqr_container"
+        android:layout_width="@dimen/khqr_card_width"
+        android:layout_height="@dimen/khqr_card_height"
+        android:layout_gravity="center"
+        >
+        <View
+            android:id="@+id/khqr_background_color"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@drawable/download_share_khqr_header_shape"
+            />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_marginTop="16.5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/khqr_logo"
+            android:layout_gravity="center|top"
+            />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="47dp"
+            >
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:background="@drawable/cut_corner_background_white_shape"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <!--customer name amount-->
+                <include layout="@layout/customer_name_amount_layout"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@drawable/dash_line_horizontal"
+                    />
+
+                <!--     qrcode-->
+                <!--                            <include layout="@layout/qrcode_image_layout"/>-->
+
+                <FrameLayout
+                    android:id="@+id/container_qr_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="25dp"
+                    >
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/khqr_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/qrcode"
+                        android:layout_gravity="center"
+                        />
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/khqr_currency_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/usd_khqr_logo"
+                        android:layout_gravity="center"
+                        />
+                </FrameLayout>
+
+
+            </LinearLayout>
+        </FrameLayout>
+    </FrameLayout>
+
+<!--</androidx.cardview.widget.CardView>-->
